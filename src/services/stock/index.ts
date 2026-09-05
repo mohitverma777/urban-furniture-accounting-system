@@ -52,5 +52,5 @@ export async function getProductStockOnHand(productId: string): Promise<number> 
     .from(stockMovements)
     .where(eq(stockMovements.productId, productId));
 
-  return (res?.totalQuantity ?? 0) as number;
+  return Number(res?.totalQuantity ?? 0);
 }
