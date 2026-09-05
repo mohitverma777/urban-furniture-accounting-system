@@ -39,6 +39,8 @@ import {
   stockMovements,
 } from "./schema";
 
+import { seedUsers } from "./seed-users";
+
 // ---------------------------------------------------------------------------
 // Deterministic UUIDs
 // ---------------------------------------------------------------------------
@@ -157,6 +159,7 @@ export async function seed() {
   db.run(sql`DELETE FROM journals;`);
   db.run(sql`DELETE FROM accounts;`);
   db.run(sql`DELETE FROM products;`);
+  db.run(sql`DELETE FROM users;`);
   db.run(sql`DELETE FROM contacts;`);
   db.run(sql`PRAGMA foreign_keys = ON;`);
 
@@ -215,6 +218,8 @@ export async function seed() {
       updatedAt: DATES.Jan01,
     },
   ]);
+
+  await seedUsers();
 
   console.log("🛋️  [Seed] Seeding Products...");
   // All monetary values in INTEGER PAISE (1 INR = 100 paise)

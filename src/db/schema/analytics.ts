@@ -68,6 +68,9 @@ export const budgets = sqliteTable(
     /** Budget period end (stored as Unix timestamp / seconds) */
     endDate: integer("end_date", { mode: "timestamp" }).notNull(),
 
+    /** Responsible person for budget management (Problem Statement requirement) */
+    responsiblePerson: text("responsible_person"),
+
     createdAt: integer("created_at", { mode: "timestamp" })
       .notNull()
       .$defaultFn(() => new Date()),

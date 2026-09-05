@@ -36,6 +36,7 @@ export interface AuditFinding {
   severity: AnomalySeverity;
   title: string;
   description: string;
+  amount?: number;
   amountPaise?: number;
   amountFormatted?: string;
   references?: string[];
@@ -121,9 +122,10 @@ export async function checkJournalBalance(
         type: "UNBALANCED_JOURNAL_ENTRY",
         severity: "CRITICAL",
         title: `Unbalanced Journal Entry (${refStr})`,
-        description: `Journal entry on ${dateStr} is unbalanced. Total Debit: ${formatINR(
+        description: `Journal entry on ${dateStr} requires review. Total Debit: ${formatINR(
           totalDebit
         )}, Total Credit: ${formatINR(totalCredit)}. Imbalance difference: ${formatINR(diff)}.`,
+        amount: diff / 100,
         amountPaise: diff,
         amountFormatted: formatINR(diff),
         entityId: entry.id,
@@ -204,7 +206,8 @@ export async function detectPotentialDuplicatePayments(
               p1.amount
             )} recorded for '${partyName}' on ${date1} and ${date2} (within ${Math.round(
               timeDiff / (1000 * 60 * 60 * 24)
-            )} days).`,
+            )} days). Requires review.`,
+            amount: p1.amount / 100,
             amountPaise: p1.amount,
             amountFormatted: formatINR(p1.amount),
             references: [p1.id, p2.id],
@@ -278,7 +281,8 @@ export async function detectSpendingSpikes(
           po.totalAmount
         )} is ${ratio}x higher than the average purchase order baseline (${formatINR(
           meanPoAmount
-        )}).`,
+        )}). Potential anomaly requiring review.`,
+        amount: po.totalAmount / 100,
         amountPaise: po.totalAmount,
         amountFormatted: formatINR(po.totalAmount),
         entityId: po.id,
@@ -300,10 +304,6 @@ export async function detectUncategorizedExpenses(
 ): Promise<AuditFinding[]> {
   const findings: AuditFinding[] = [];
 
-  // Deterministic rule:
-  // Find journal items posted to accounts categorized as EXPENSE:
-  // - Where account code is "5999" or name contains "uncategorized", "suspense", or "miscellaneous"
-  // - Or where expense item lacks analyticAccountId cost center when analytic accounts exist in system
   const expenseItems = await db
     .select({
       itemId: journalItems.id,
@@ -346,7 +346,8 @@ export async function detectUncategorizedExpenses(
           item.debit
         )} on ${dateStr} was charged to generic account '${item.accountCode} - ${
           item.accountName
-        }'. Reclassify to an operational expense account.`,
+        }'. Requires review and reclassification.`,
+        amount: item.debit / 100,
         amountPaise: item.debit,
         amountFormatted: formatINR(item.debit),
         entityId: item.entryId,
@@ -368,9 +369,6 @@ export async function detectMissingAccountingMetadata(
 ): Promise<AuditFinding[]> {
   const findings: AuditFinding[] = [];
 
-  // Deterministic rules:
-  // 1. Journal entries missing reference or description
-  // 2. Payments missing reference (UTR/cheque)
   const entries = await db
     .select({
       id: journalEntries.id,
@@ -399,7 +397,7 @@ export async function detectMissingAccountingMetadata(
         title: `Missing Metadata on Journal Entry (${entry.id.substring(0, 8)})`,
         description: `Journal entry posted on ${dateStr} is missing required audit metadata: ${missingFields.join(
           ", "
-        )}.`,
+        )}. Requires review.`,
         entityId: entry.id,
         entityType: "JOURNAL_ENTRY",
         createdAt: dateStr,
@@ -407,7 +405,6 @@ export async function detectMissingAccountingMetadata(
     }
   }
 
-  // Check payments missing payment reference
   const allPayments = await db
     .select({
       id: payments.id,
@@ -430,7 +427,8 @@ export async function detectMissingAccountingMetadata(
         title: `Missing External Reference on Payment (${formatINR(p.amount)})`,
         description: `Payment of ${formatINR(
           p.amount
-        )} posted on ${dateStr} is missing external reference (bank UTR, cheque, or transaction ID).`,
+        )} posted on ${dateStr} is missing external reference (bank UTR, cheque, or transaction ID). Requires review.`,
+        amount: p.amount / 100,
         amountPaise: p.amount,
         amountFormatted: formatINR(p.amount),
         entityId: p.id,

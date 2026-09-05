@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import { getPurchaseOrderById } from "@/services/purchases";
+import { getTransactionTimeline } from "@/services/accounting/timeline";
 import { PurchaseDetailClient } from "@/components/purchases/purchase-detail-client";
 
 export const dynamic = "force-dynamic";
@@ -11,10 +12,11 @@ interface PurchaseDetailPageProps {
 export default async function PurchaseDetailPage({ params }: PurchaseDetailPageProps) {
   const resolvedParams = await params;
   const detail = await getPurchaseOrderById(resolvedParams.id);
+  const timeline = await getTransactionTimeline(resolvedParams.id);
 
   if (!detail) {
     notFound();
   }
 
-  return <PurchaseDetailClient detail={detail} />;
+  return <PurchaseDetailClient detail={detail} timeline={timeline} />;
 }

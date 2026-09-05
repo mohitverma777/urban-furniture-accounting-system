@@ -37,7 +37,7 @@ describe("Infrastructure Diagnostics & Providers", () => {
   it("resolves auth provider session", async () => {
     expect(authProvider.name).toBe("demo");
     const session = await authProvider.getSession();
-    expect(session?.user.role).toBe("admin");
+    expect(session?.user.role).toBe("ADMIN");
   });
 
   it("generates system diagnostics report", async () => {

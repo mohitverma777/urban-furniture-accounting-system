@@ -21,6 +21,7 @@
 // Standalone domain tables
 export * from "./contacts";
 export * from "./products";
+export * from "./users";
 
 // Accounting configuration
 export * from "./accounts";

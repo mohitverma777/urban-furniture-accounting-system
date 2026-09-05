@@ -2,16 +2,6 @@
  * src/infrastructure/auth/provider.ts
  *
  * Abstract authentication / session provider interface.
- *
- * In development / hackathon demo: AUTH_PROVIDER=demo
- *   → Returns a hard-coded demo user based on a session cookie value.
- *   → Role can be switched in the UI without any real login flow.
- *
- * In production: AUTH_PROVIDER=production
- *   → Delegates to a real auth system (NextAuth.js, Clerk, etc.)
- *
- * Business services must NEVER call concrete auth implementations directly.
- * They receive a resolved `DemoUser` (or equivalent) through Server Actions.
  */
 
 import type { DemoUser, UserRole } from "@/lib/types";
@@ -31,63 +21,37 @@ export interface Session {
 // ---------------------------------------------------------------------------
 
 export interface AuthProvider {
-  /**
-   * Provider identifier.
-   */
   readonly name: "demo" | "production";
-
-  /**
-   * Resolve the current session from the incoming request context.
-   * Returns null if there is no valid session.
-   */
   getSession(): Promise<Session | null>;
-
-  /**
-   * Create or refresh a session for the given user.
-   * In demo mode, this simply stores the role in a cookie.
-   */
   createSession(user: DemoUser): Promise<Session>;
-
-  /**
-   * Destroy the current session (logout).
-   */
   destroySession(): Promise<void>;
 }
 
 // ---------------------------------------------------------------------------
-// Demo users — fixed personas for the hackathon demo experience
+// Demo users — personas for testing
 // ---------------------------------------------------------------------------
 
 export const DEMO_USERS: Record<UserRole, DemoUser> = {
-  admin: {
+  ADMIN: {
     id: "demo-admin",
+    loginId: "admin",
     name: "Admin User",
-    role: "admin",
-    email: "admin@urbanfurniture.demo",
+    role: "ADMIN",
+    email: "admin@urbanfurniture.com",
   },
-  accountant: {
+  ACCOUNTANT: {
     id: "demo-accountant",
+    loginId: "accountant",
     name: "Priya Sharma",
-    role: "accountant",
-    email: "priya@urbanfurniture.demo",
+    role: "ACCOUNTANT",
+    email: "accountant@urbanfurniture.com",
   },
-  sales_manager: {
-    id: "demo-sales",
-    name: "Rahul Mehta",
-    role: "sales_manager",
-    email: "rahul@urbanfurniture.demo",
-  },
-  purchase_manager: {
-    id: "demo-purchase",
-    name: "Anita Desai",
-    role: "purchase_manager",
-    email: "anita@urbanfurniture.demo",
-  },
-  viewer: {
-    id: "demo-viewer",
-    name: "Read Only",
-    role: "viewer",
-    email: "viewer@urbanfurniture.demo",
+  USER: {
+    id: "demo-user",
+    loginId: "user",
+    name: "Nimesh Pathak",
+    role: "USER",
+    email: "user@urbanfurniture.com",
   },
 };
 
@@ -111,7 +75,7 @@ export type Permission =
   | "admin:all";
 
 const ROLE_PERMISSIONS: Record<UserRole, Permission[]> = {
-  admin: [
+  ADMIN: [
     "accounting:read",
     "accounting:write",
     "accounting:post",
@@ -126,36 +90,23 @@ const ROLE_PERMISSIONS: Record<UserRole, Permission[]> = {
     "inventory:write",
     "admin:all",
   ],
-  accountant: [
+  ACCOUNTANT: [
     "accounting:read",
     "accounting:write",
     "accounting:post",
+    "sales:read",
+    "sales:write",
+    "purchases:read",
+    "purchases:write",
     "payments:read",
     "payments:write",
     "reports:read",
     "inventory:read",
-  ],
-  sales_manager: [
-    "sales:read",
-    "sales:write",
-    "accounting:read",
-    "reports:read",
-    "inventory:read",
-  ],
-  purchase_manager: [
-    "purchases:read",
-    "purchases:write",
-    "accounting:read",
-    "reports:read",
-    "inventory:read",
     "inventory:write",
   ],
-  viewer: [
+  USER: [
     "accounting:read",
-    "sales:read",
-    "purchases:read",
-    "reports:read",
-    "inventory:read",
+    "payments:read",
   ],
 };
 
@@ -175,9 +126,5 @@ export function requirePermission(
     );
   }
 }
-
-// ---------------------------------------------------------------------------
-// Factory signature
-// ---------------------------------------------------------------------------
 
 export type AuthProviderFactory = () => AuthProvider;

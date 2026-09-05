@@ -11,26 +11,27 @@ export const maxDuration = 60;
  * Clean UI messages into simple text-only role/content objects for Ollama compatibility.
  * Prevents Vercel AI SDK v5 "item_reference" or tool payload errors on Ollama multi-turn chats.
  */
-function sanitizeMessagesForOllama(messages: any[]) {
+function sanitizeMessagesForOllama(messages: unknown[]) {
   const cleaned: { role: "user" | "assistant"; content: string }[] = [];
 
   for (const msg of messages) {
     if (!msg || typeof msg !== "object") continue;
+    const m = msg as Record<string, unknown>;
 
     let textContent = "";
 
-    if (typeof msg.content === "string" && msg.content.trim() !== "") {
-      textContent = msg.content;
-    } else if (Array.isArray(msg.parts)) {
-      const textParts = msg.parts
-        .filter((p: any) => p && p.type === "text" && typeof p.text === "string")
-        .map((p: any) => p.text);
+    if (typeof m.content === "string" && m.content.trim() !== "") {
+      textContent = m.content;
+    } else if (Array.isArray(m.parts)) {
+      const textParts = m.parts
+        .filter((p): p is Record<string, unknown> => Boolean(p && typeof p === "object" && p.type === "text" && typeof p.text === "string"))
+        .map((p) => p.text as string);
       textContent = textParts.join("\n").trim();
     }
 
     if (!textContent) continue;
 
-    const role = msg.role === "assistant" ? "assistant" : "user";
+    const role = m.role === "assistant" ? "assistant" : "user";
     cleaned.push({ role, content: textContent });
   }
 
@@ -79,7 +80,7 @@ export async function POST(req: NextRequest) {
       const result = streamText({
         model: getAiModel("gemma3:4b"),
         system: fullSystemPrompt,
-        messages: sanitizedMessages as any,
+        messages: sanitizedMessages,
       });
 
       return result.toUIMessageStreamResponse();

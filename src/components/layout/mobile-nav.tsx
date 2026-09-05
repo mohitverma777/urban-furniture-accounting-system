@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { X, Building2 } from "lucide-react";
@@ -13,8 +13,25 @@ export interface MobileNavProps {
 
 export function MobileNav({ isOpen, onClose }: MobileNavProps) {
   const pathname = usePathname();
+  const [userRole, setUserRole] = useState<string | null>(null);
+
+  useEffect(() => {
+    fetch("/api/auth/me")
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.authenticated && data.user) {
+          setUserRole(data.user.role);
+        }
+      })
+      .catch(() => {});
+  }, []);
 
   if (!isOpen) return null;
+
+  const visibleNavItems = NAV_ITEMS.filter((item) => {
+    if (!userRole) return item.roles?.includes("ADMIN") || item.roles?.includes("ACCOUNTANT");
+    return item.roles?.includes(userRole as any);
+  });
 
   return (
     <div className="fixed inset-0 z-50 lg:hidden flex">
@@ -42,7 +59,7 @@ export function MobileNav({ isOpen, onClose }: MobileNavProps) {
         </div>
 
         <nav className="flex-1 px-3 py-4 space-y-1 overflow-y-auto">
-          {NAV_ITEMS.map((item) => {
+          {visibleNavItems.map((item) => {
             const isActive =
               item.href === "/"
                 ? pathname === "/"

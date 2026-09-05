@@ -128,3 +128,50 @@
     @apply font-sans;
   }
 }
+
+/* ---------------------------------------------------------------------------
+ * High-Quality Print Styles for Financial Reports PDF Export
+ * --------------------------------------------------------------------------- */
+@media print {
+  aside,
+  header,
+  nav,
+  button,
+  .print\:hidden,
+  .no-print {
+    display: none !important;
+  }
+
+  body,
+  html {
+    background: #ffffff !important;
+    color: #000000 !important;
+    overflow: visible !important;
+    height: auto !important;
+    width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  main {
+    padding: 0 !important;
+    margin: 0 !important;
+    max-width: 100% !important;
+    width: 100% !important;
+    overflow: visible !important;
+  }
+
+  .print\:block {
+    display: block !important;
+  }
+
+  table {
+    page-break-inside: auto;
+    width: 100% !important;
+  }
+
+  tr {
+    page-break-inside: avoid;
+    page-break-after: auto;
+  }
+}

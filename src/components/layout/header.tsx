@@ -1,26 +1,63 @@
 "use client";
 
-import React, { useState } from "react";
-import { Menu, User, ShieldCheck } from "lucide-react";
+import React, { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import { Menu, User, LogOut, ShieldCheck, UserCheck } from "lucide-react";
 import { Breadcrumbs } from "./breadcrumbs";
 import { MobileNav } from "./mobile-nav";
-import type { UserRole } from "@/lib/types";
 
-const ROLES: { role: UserRole; name: string }[] = [
-  { role: "admin", name: "Admin" },
-  { role: "accountant", name: "Priya (Accountant)" },
-  { role: "sales_manager", name: "Rahul (Sales)" },
-  { role: "purchase_manager", name: "Anita (Purchase)" },
-  { role: "viewer", name: "Viewer (Read Only)" },
-];
+interface UserProfile {
+  id: string;
+  loginId: string;
+  name: string;
+  email: string;
+  role: "ADMIN" | "ACCOUNTANT" | "USER";
+}
 
 export function Header() {
+  const router = useRouter();
   const [mobileOpen, setMobileOpen] = useState(false);
-  const [activeRole, setActiveRole] = useState<UserRole>("admin");
+  const [user, setUser] = useState<UserProfile | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetch("/api/auth/me")
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.authenticated && data.user) {
+          setUser(data.user);
+        }
+        setLoading(false);
+      })
+      .catch(() => setLoading(false));
+  }, []);
+
+  const handleLogout = async () => {
+    try {
+      await fetch("/api/auth/logout", { method: "POST" });
+      router.push("/auth/login");
+      router.refresh();
+    } catch (err) {
+      console.error("Logout failed:", err);
+    }
+  };
+
+  const getRoleBadge = (role: string) => {
+    switch (role) {
+      case "ADMIN":
+        return <span className="px-2 py-0.5 rounded text-[10px] font-bold uppercase bg-purple-900/50 text-purple-300 border border-purple-700/50">ADMIN</span>;
+      case "ACCOUNTANT":
+        return <span className="px-2 py-0.5 rounded text-[10px] font-bold uppercase bg-blue-900/50 text-blue-300 border border-blue-700/50">ACCOUNTANT</span>;
+      case "USER":
+        return <span className="px-2 py-0.5 rounded text-[10px] font-bold uppercase bg-slate-800 text-slate-300 border border-slate-700">USER</span>;
+      default:
+        return null;
+    }
+  };
 
   return (
     <>
-      <header className="h-16 bg-slate-950/80 border-b border-slate-800 px-4 sm:px-6 flex items-center justify-between sticky top-0 z-30 backdrop-blur-md select-none">
+      <header className="h-16 bg-slate-950/80 border-b border-slate-800 px-4 sm:px-6 flex items-center justify-between sticky top-0 z-30 backdrop-blur-md select-none print:hidden">
         <div className="flex items-center gap-4">
           <button
             onClick={() => setMobileOpen(true)}
@@ -33,34 +70,43 @@ export function Header() {
         </div>
 
         <div className="flex items-center gap-4">
-          {/* Demo Persona Role Switcher */}
-          <div className="hidden sm:flex items-center gap-2 bg-slate-900 border border-slate-800 rounded-xl p-1 text-xs">
-            <span className="text-slate-400 pl-2 flex items-center gap-1 font-medium">
-              <ShieldCheck className="w-3.5 h-3.5 text-amber-400" />
-              <span>Persona:</span>
-            </span>
-            <select
-              value={activeRole}
-              onChange={(e) => setActiveRole(e.target.value as UserRole)}
-              className="bg-slate-800 text-slate-200 border-0 rounded-lg px-2 py-1 text-xs focus:ring-1 focus:ring-amber-400 font-medium outline-none cursor-pointer"
-            >
-              {ROLES.map((r) => (
-                <option key={r.role} value={r.role}>
-                  {r.name}
-                </option>
-              ))}
-            </select>
-          </div>
+          {/* User Profile & Role Info */}
+          {user ? (
+            <div className="flex items-center gap-3 pl-2 border-l border-slate-800">
+              <div className="flex items-center gap-2">
+                <div className="w-8 h-8 rounded-full bg-slate-800 border border-slate-700 flex items-center justify-center text-slate-300">
+                  <User className="w-4 h-4" />
+                </div>
+                <div className="hidden sm:flex flex-col text-left">
+                  <span className="text-xs font-semibold text-slate-200 leading-tight">
+                    {user.name}
+                  </span>
+                  <span className="text-[10px] text-slate-400 font-mono">
+                    @{user.loginId}
+                  </span>
+                </div>
+              </div>
 
-          {/* User Avatar */}
-          <div className="flex items-center gap-2 pl-2 border-l border-slate-800">
-            <div className="w-8 h-8 rounded-full bg-slate-800 border border-slate-700 flex items-center justify-center text-slate-300">
-              <User className="w-4 h-4" />
+              {getRoleBadge(user.role)}
+
+              <button
+                onClick={handleLogout}
+                title="Logout"
+                className="p-1.5 rounded-lg text-slate-400 hover:text-rose-400 hover:bg-slate-900 transition-colors ml-1"
+              >
+                <LogOut className="w-4 h-4" />
+              </button>
             </div>
-            <span className="hidden md:inline text-xs font-semibold text-slate-200">
-              {ROLES.find((r) => r.role === activeRole)?.name.split(" ")[0]}
-            </span>
-          </div>
+          ) : (
+            <div className="flex items-center gap-2">
+              <a
+                href="/auth/login"
+                className="text-xs font-semibold text-amber-400 hover:text-amber-300"
+              >
+                Log In
+              </a>
+            </div>
+          )}
         </div>
       </header>
 

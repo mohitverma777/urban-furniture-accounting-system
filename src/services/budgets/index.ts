@@ -38,6 +38,7 @@ export interface CreateBudgetInput {
   plannedAmount: number; // in Paise
   startDate: Date;
   endDate: Date;
+  responsiblePerson?: string;
 }
 
 export interface BudgetReportItem {
@@ -52,6 +53,7 @@ export interface BudgetReportItem {
   utilizationPercentage: number; // e.g. 75.5
   startDate: Date;
   endDate: Date;
+  responsiblePerson?: string | null;
   status: BudgetStatus;
 }
 
@@ -129,6 +131,7 @@ export async function createBudget(input: CreateBudgetInput): Promise<Budget> {
       plannedAmount: input.plannedAmount,
       startDate: input.startDate,
       endDate: input.endDate,
+      responsiblePerson: input.responsiblePerson ?? null,
     })
     .returning();
 
@@ -144,6 +147,7 @@ export async function getBudgetsList() {
       plannedAmount: budgets.plannedAmount,
       startDate: budgets.startDate,
       endDate: budgets.endDate,
+      responsiblePerson: budgets.responsiblePerson,
       analyticName: analyticAccounts.name,
       analyticType: analyticAccounts.type,
     })
@@ -221,6 +225,7 @@ export async function getBudgetReportItems(): Promise<BudgetReportItem[]> {
       utilizationPercentage,
       startDate: new Date(b.startDate),
       endDate: new Date(b.endDate),
+      responsiblePerson: b.responsiblePerson,
       status,
     });
   }

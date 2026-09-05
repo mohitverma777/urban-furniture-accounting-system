@@ -1,7 +1,7 @@
 /**
  * src/infrastructure/auth/local.ts
  *
- * Demo/local implementation of AuthProvider using cookie-based session switching.
+ * Demo/local implementation of AuthProvider.
  */
 
 import type { DemoUser, UserRole } from "@/lib/types";
@@ -9,10 +9,10 @@ import { DEMO_USERS, type AuthProvider, type Session } from "./provider";
 
 export class LocalAuthProvider implements AuthProvider {
   readonly name = "demo" as const;
-  private currentRole: UserRole = "admin";
+  private currentRole: UserRole = "ADMIN";
 
   async getSession(): Promise<Session | null> {
-    const user = DEMO_USERS[this.currentRole] ?? DEMO_USERS.admin;
+    const user = DEMO_USERS[this.currentRole] ?? DEMO_USERS.ADMIN;
     return {
       user,
       expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
@@ -28,7 +28,7 @@ export class LocalAuthProvider implements AuthProvider {
   }
 
   async destroySession(): Promise<void> {
-    this.currentRole = "viewer";
+    this.currentRole = "USER";
   }
 }
 

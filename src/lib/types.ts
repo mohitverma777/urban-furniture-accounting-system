@@ -153,19 +153,30 @@ export type JournalType =
 export type TaxType = "percentage" | "fixed";
 
 // ---------------------------------------------------------------------------
-// User role (demo auth)
+// User role (authentication system)
 // ---------------------------------------------------------------------------
 
 export type UserRole =
+  | "ADMIN"
+  | "ACCOUNTANT"
+  | "USER";
+
+/** Legacy lowercase aliases for backward compatibility */
+export type UserRoleLegacy =
   | "admin"
   | "accountant"
   | "sales_manager"
   | "purchase_manager"
   | "viewer";
 
-export interface DemoUser {
+export interface AuthUser {
   readonly id: string;
   readonly name: string;
   readonly role: UserRole;
   readonly email: string;
+  readonly loginId: string;
+  readonly contactId?: string | null;
 }
+
+export type DemoUser = AuthUser;
+

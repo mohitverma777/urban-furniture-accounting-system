@@ -15,8 +15,11 @@ import {
 import { convertOrderToVendorBillAction } from "@/actions/purchases";
 import { VendorPaymentModal } from "./vendor-payment-modal";
 import { AccountingImpactCard } from "./accounting-impact-card";
+import { TransactionTimeline } from "@/components/accounting/transaction-timeline";
+import type { TransactionTimelineData } from "@/services/accounting/timeline";
 
 export interface PurchaseDetailClientProps {
+  timeline?: TransactionTimelineData | null;
   detail: {
     order: {
       id: string;
@@ -73,7 +76,7 @@ export interface PurchaseDetailClientProps {
   };
 }
 
-export function PurchaseDetailClient({ detail }: PurchaseDetailClientProps) {
+export function PurchaseDetailClient({ detail, timeline }: PurchaseDetailClientProps) {
   const { order, items, payments, totalPaid, outstandingAmount, journalEntry } = detail;
   const [isConverting, setIsConverting] = useState(false);
   const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
@@ -321,6 +324,9 @@ export function PurchaseDetailClient({ detail }: PurchaseDetailClientProps) {
         </h3>
         <AccountingImpactCard journalEntry={journalEntry} />
       </div>
+
+      {/* Transaction Timeline Stream */}
+      <TransactionTimeline timeline={timeline || null} />
 
       {/* Payment History Timeline */}
       <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 space-y-4 shadow-xl">

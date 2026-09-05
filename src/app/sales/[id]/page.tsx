@@ -1,5 +1,7 @@
 import { notFound } from "next/navigation";
 import { getSalesOrderById } from "@/services/sales";
+import { getTransactionTimeline } from "@/services/accounting/timeline";
+import { TransactionTimeline } from "@/components/accounting/transaction-timeline";
 import { PageHeader } from "@/components/common/page-header";
 import { AccountingImpactCard } from "@/components/sales/accounting-impact-card";
 import { SalesInvoiceActions } from "@/components/sales/sales-invoice-actions";
@@ -15,6 +17,7 @@ export default async function SalesInvoiceDetailPage({
 }) {
   const { id } = await params;
   const data = await getSalesOrderById(id);
+  const timeline = await getTransactionTimeline(id);
 
   if (!data) {
     notFound();
@@ -206,6 +209,9 @@ export default async function SalesInvoiceDetailPage({
 
       {/* View Accounting Entry Panel */}
       <AccountingImpactCard entryData={journalEntryData} />
+
+      {/* Transaction Timeline & Double-Entry Accounting Impact Stream */}
+      <TransactionTimeline timeline={timeline} />
 
       {/* Payment Receipts History */}
       {orderPayments.length > 0 && (

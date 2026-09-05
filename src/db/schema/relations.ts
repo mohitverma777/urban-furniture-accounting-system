@@ -22,6 +22,7 @@ import { orderItems, orders } from "./orders";
 import { payments } from "./payments";
 import { products } from "./products";
 import { stockMovements } from "./stock";
+import { users } from "./users";
 
 // ---------------------------------------------------------------------------
 // contacts
@@ -29,6 +30,18 @@ import { stockMovements } from "./stock";
 
 export const contactsRelations = relations(contacts, ({ many }) => ({
   orders: many(orders),
+  users: many(users),
+}));
+
+// ---------------------------------------------------------------------------
+// users
+// ---------------------------------------------------------------------------
+
+export const usersRelations = relations(users, ({ one }) => ({
+  contact: one(contacts, {
+    fields: [users.contactId],
+    references: [contacts.id],
+  }),
 }));
 
 // ---------------------------------------------------------------------------
