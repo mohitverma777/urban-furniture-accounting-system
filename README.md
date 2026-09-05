@@ -1,6 +1,8 @@
 # 🛋️ Urban Furniture Accounting & ERP System
 
-An enterprise-grade, modern Accounting & ERP web application engineered for the **Urban Furniture** use-case. Built with **Next.js 15 App Router**, **TypeScript**, **Drizzle ORM**, and **SQLite**, featuring a **double-entry ledger engine**, **Indian GST compliance reports**, **predictive AI cash flow forecasting**, **one-click PDF invoice generation**, **low stock reorder alerts**, and **role-based access control**.
+An enterprise-grade, modern Accounting & ERP web application engineered for the **Urban Furniture** use-case. Built with **Next.js 15 App Router**, **TypeScript**, **Drizzle ORM**, and **SQLite**, featuring a **double-entry ledger engine**, **Indian GST compliance reports**, **predictive AI cash flow forecasting**, **one-click PDF invoice generation**, **low stock reorder alerts**, **AI executive business briefings**, and **role-based access control**.
+
+> 📖 **Looking for full documentation?** Check out the [Complete User Manual (USER_MANUAL.md)](file:///c:/Users/mohit/OneDrive/Documents/odoo_hackathon_final/urban-furniture-accounting/USER_MANUAL.md) for step-by-step guides on **WHY**, **WHERE**, and **HOW** to use every feature.
 
 ---
 
