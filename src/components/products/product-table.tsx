@@ -17,6 +17,7 @@ import { ProductDialog } from "./product-dialog";
 import { ConfirmDialog } from "@/components/common/confirm-dialog";
 import { EmptyState } from "@/components/common/empty-state";
 import { useToast } from "@/components/ui/toast";
+import { useRouter } from "next/navigation";
 import { archiveProductAction, unarchiveProductAction } from "@/actions/products";
 
 const columnHelper = createColumnHelper<Product>();
@@ -26,6 +27,7 @@ export interface ProductTableProps {
 }
 
 export function ProductTable({ initialProducts }: ProductTableProps) {
+  const router = useRouter();
   const { toast } = useToast();
   const [data, setData] = useState<Product[]>(initialProducts);
   const [searchQuery, setSearchQuery] = useState("");
@@ -362,6 +364,11 @@ export function ProductTable({ initialProducts }: ProductTableProps) {
         isOpen={dialogOpen}
         onClose={() => setDialogOpen(false)}
         initialData={selectedProduct}
+        onSuccess={async () => {
+          const updated = await fetch("/api/products").then((r) => r.json()).catch(() => null);
+          if (updated) setData(updated);
+          router.refresh();
+        }}
       />
 
       {/* Confirmation Dialog for Archive / Restore */}

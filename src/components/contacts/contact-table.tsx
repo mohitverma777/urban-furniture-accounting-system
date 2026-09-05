@@ -16,6 +16,7 @@ import { ContactDialog } from "./contact-dialog";
 import { ConfirmDialog } from "@/components/common/confirm-dialog";
 import { EmptyState } from "@/components/common/empty-state";
 import { useToast } from "@/components/ui/toast";
+import { useRouter } from "next/navigation";
 import { archiveContactAction, unarchiveContactAction } from "@/actions/contacts";
 
 const columnHelper = createColumnHelper<Contact>();
@@ -25,6 +26,7 @@ export interface ContactTableProps {
 }
 
 export function ContactTable({ initialContacts }: ContactTableProps) {
+  const router = useRouter();
   const { toast } = useToast();
   const [data, setData] = useState<Contact[]>(initialContacts);
   const [searchQuery, setSearchQuery] = useState("");
@@ -328,9 +330,9 @@ export function ContactTable({ initialContacts }: ContactTableProps) {
         onClose={() => setDialogOpen(false)}
         initialData={selectedContact}
         onSuccess={async () => {
-          // Re-fetch or update
           const updated = await fetch("/api/contacts").then((r) => r.json()).catch(() => null);
           if (updated) setData(updated);
+          router.refresh();
         }}
       />
 
