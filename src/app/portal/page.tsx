@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
-import { FileText, CreditCard, User, ShoppingBag, ArrowRight } from "lucide-react";
+import { FileText, CreditCard, User, ArrowRight } from "lucide-react";
 
 interface UserProfile {
   id: string;
@@ -31,8 +31,8 @@ export default function PortalPage() {
 
   if (loading) {
     return (
-      <div className="p-8 flex items-center justify-center">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div>
+      <div className="p-12 flex items-center justify-center">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-amber-500"></div>
       </div>
     );
   }
@@ -40,64 +40,65 @@ export default function PortalPage() {
   return (
     <div className="p-6 space-y-6 max-w-7xl mx-auto">
       <div>
-        <h1 className="text-2xl font-bold text-slate-900 dark:text-white">
+        <h1 className="text-2xl font-bold text-slate-100">
           Customer Portal
         </h1>
-        <p className="text-slate-500 dark:text-slate-400">
-          Welcome back, {user?.name || "Customer"}. View your invoices, payments, and account details.
+        <p className="text-slate-400 text-sm">
+          Welcome back, {user?.name || "Customer"}. View your invoices, payment receipts, and account balance.
         </p>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <Link
           href="/portal/invoices"
-          className="p-6 bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm hover:shadow-md transition-shadow group"
+          className="p-6 bg-slate-900 rounded-2xl border border-slate-800 shadow-lg hover:border-slate-700 transition-all group"
         >
           <div className="flex items-center justify-between">
-            <div className="p-3 bg-indigo-50 dark:bg-indigo-900/30 rounded-lg text-indigo-600 dark:text-indigo-400">
+            <div className="p-3 bg-indigo-500/10 rounded-xl text-indigo-400 border border-indigo-500/20">
               <FileText className="h-6 w-6" />
             </div>
-            <ArrowRight className="h-5 w-5 text-slate-400 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors" />
+            <ArrowRight className="h-5 w-5 text-slate-500 group-hover:text-amber-400 transition-colors" />
           </div>
-          <h2 className="mt-4 text-lg font-semibold text-slate-900 dark:text-white">
+          <h2 className="mt-4 text-lg font-semibold text-slate-100">
             My Invoices
           </h2>
-          <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
-            View past and outstanding customer invoices.
+          <p className="mt-1 text-xs text-slate-400">
+            View commercial invoices, payment status, and download corporate PDFs.
           </p>
         </Link>
 
         <Link
           href="/portal/payments"
-          className="p-6 bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm hover:shadow-md transition-shadow group"
+          className="p-6 bg-slate-900 rounded-2xl border border-slate-800 shadow-lg hover:border-slate-700 transition-all group"
         >
           <div className="flex items-center justify-between">
-            <div className="p-3 bg-emerald-50 dark:bg-emerald-900/30 rounded-lg text-emerald-600 dark:text-emerald-400">
+            <div className="p-3 bg-emerald-500/10 rounded-xl text-emerald-400 border border-emerald-500/20">
               <CreditCard className="h-6 w-6" />
             </div>
-            <ArrowRight className="h-5 w-5 text-slate-400 group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors" />
+            <ArrowRight className="h-5 w-5 text-slate-500 group-hover:text-amber-400 transition-colors" />
           </div>
-          <h2 className="mt-4 text-lg font-semibold text-slate-900 dark:text-white">
+          <h2 className="mt-4 text-lg font-semibold text-slate-100">
             My Payments
           </h2>
-          <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
-            Track payment history and transaction records.
+          <p className="mt-1 text-xs text-slate-400">
+            Track bank and cash transaction history and verified receipts.
           </p>
         </Link>
 
-        <div className="p-6 bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm">
+        <div className="p-6 bg-slate-900 rounded-2xl border border-slate-800 shadow-lg">
           <div className="flex items-center justify-between">
-            <div className="p-3 bg-amber-50 dark:bg-amber-900/30 rounded-lg text-amber-600 dark:text-amber-400">
+            <div className="p-3 bg-amber-500/10 rounded-xl text-amber-400 border border-amber-500/20">
               <User className="h-6 w-6" />
             </div>
           </div>
-          <h2 className="mt-4 text-lg font-semibold text-slate-900 dark:text-white">
+          <h2 className="mt-4 text-lg font-semibold text-slate-100">
             Account Profile
           </h2>
-          <div className="mt-2 space-y-1 text-xs text-slate-500 dark:text-slate-400">
-            <p><span className="font-medium text-slate-700 dark:text-slate-300">Login ID:</span> {user?.loginId}</p>
-            <p><span className="font-medium text-slate-700 dark:text-slate-300">Email:</span> {user?.email}</p>
-            <p><span className="font-medium text-slate-700 dark:text-slate-300">Role:</span> {user?.role}</p>
+          <div className="mt-2 space-y-1.5 text-xs text-slate-400">
+            <p><span className="font-semibold text-slate-300">Account:</span> {user?.name}</p>
+            <p><span className="font-semibold text-slate-300">Login ID:</span> @{user?.loginId}</p>
+            <p><span className="font-semibold text-slate-300">Email:</span> {user?.email}</p>
+            <p><span className="font-semibold text-slate-300">Portal Role:</span> {user?.role}</p>
           </div>
         </div>
       </div>

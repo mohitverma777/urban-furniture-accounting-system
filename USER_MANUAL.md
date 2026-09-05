@@ -23,7 +23,9 @@
    - [Customer Credit & Vendor Performance Scoring](#-customer-credit--vendor-performance-scoring)
 7. [🔎 Global Command Palette (`Ctrl + K`)](#7--global-command-palette-ctrl--k)
 8. [🧪 Automated Testing & Verification](#8--automated-testing--verification)
-9. [❓ Frequently Asked Questions & Troubleshooting](#9--frequently-asked-questions--troubleshooting)
+9. [🎬 5–7 Minute Judge Demo Script & Presentation Flow](#9--57-minute-judge-demo-script--presentation-flow)
+10. [❓ Frequently Asked Questions & Troubleshooting](#10--frequently-asked-questions--troubleshooting)
+
 
 ---
 
@@ -286,7 +288,65 @@ npx tsc --noEmit
 
 ---
 
-## 9. ❓ Frequently Asked Questions & Troubleshooting
+## 9. 🎬 5–7 Minute Judge Demo Script & Presentation Flow
+
+Follow this battle-tested narrative designed specifically for hackathon evaluation panels:
+
+### ⏱️ Minute 0:00 – 1:00 | The Problem & Executive Command Center
+1. **Login as Admin** (`admin` / `admin123`) at `/auth/login`.
+2. Lands on **Financial Dashboard** (`/`).
+3. **Showcase Real-Time Health**: Point to Total Revenue, Net Margin, Receivables, and Cash Position.
+4. **Click `✨ Generate Business Summary`**:
+   - Watch the AI synthesise raw P&L, balance sheet, and inventory telemetry into an executive briefing with MoM trends, key observations, and recommended action items.
+   - *Key Talking Point*: "Instead of drowning managers in static spreadsheets, Urban Furniture provides an on-demand AI Chief Financial Officer."
+
+### ⏱️ Minute 1:00 – 2:15 | Commercial Sales Cycle & Non-Repudiation Double Entry
+1. Press <kbd>Ctrl + K</kbd> to launch the Command Palette, type `SO-2026-001`, and press <kbd>Enter</kbd> to jump straight into the order.
+2. **Review Invoice Details**:
+   - Highlight GSTIN, billing/shipping addresses, and tax breakdown (CGST + SGST vs IGST).
+   - Click **Download PDF** to show high-resolution server-rendered corporate tax invoice with Urban Furniture branding.
+3. **Inspect the Double-Entry Accounting Tab**:
+   - Show the auto-posted General Ledger voucher:
+     - `Dr Accounts Receivable` = ₹1,77,000
+     - `Cr Furniture Sales Revenue` = ₹1,50,000
+     - `Cr Output GST Payable` = ₹27,000
+   - Point to $\sum \text{Dr} \equiv \sum \text{Cr}$ (Difference: ₹0.00).
+4. **Click `Explain This Transaction`**:
+   - Watch the AI contextual breakdown explain the revenue recognition and tax liability timing.
+
+### ⏱️ Minute 2:15 – 3:15 | Perpetual Inventory & Procurement Loop
+1. Navigate to **Inventory** (`/stock`).
+2. Show perpetual stock tracking: Finished Sofas, Dining Tables, and Raw Timber.
+3. Observe items flagged as **LOW STOCK** ($\le 5$ units).
+4. Demonstrate the closed-loop workflow:
+   - Click **Reorder** on an alert item.
+   - System pre-populates a vendor draft Purchase Order (`/purchases`), completing the inventory-to-procurement cycle.
+
+### ⏱️ Minute 3:15 – 4:15 | Indian GST Compliance & Cash Flow Intelligence
+1. Navigate to **Reports → Indian GST** (`/reports/gst`):
+   - Highlight outward supply GST splits (0%, 5%, 12%, 18%) and inward Input Tax Credit (ITC).
+   - Point out the Net Tax Liability computation banner.
+2. Navigate to **Reports → Cash Flow Forecast** (`/reports/cash-flow`):
+   - Highlight the linear regression forecasting model ($y = mx + c$) trained on actual GL transactions.
+   - Show the 95% Student's t confidence interval shading predicting quarter-end runway.
+
+### ⏱️ Minute 4:15 – 5:15 | Role-Based Access Control & Customer Self-Service
+1. Log out from Admin and log in as Customer User (`user` / `user123`).
+2. **Strict RBAC Boundary**:
+   - Demonstrate that the customer is locked into `/portal`.
+   - Attempting to access `/admin/users`, `/accounting`, or other customers' sales orders directly returns a `403 Forbidden` or redirects safely.
+3. **Customer Portal Experience**:
+   - Customer views their own invoices (`SO-2026-001`), downloads their authorized PDF invoice, and tracks payment status.
+
+### ⏱️ Minute 5:15 – 6:00 | Dual AI Architecture & Offline Guarantee
+1. Log back in as `admin` and open **AI Assistant** (`/ai`).
+2. Type: *"What was our total revenue and what is our current tax liability?"*
+3. FinBot responds with exact figures pulled from live database state.
+4. *Key Talking Point*: "Urban Furniture features hybrid AI: Cloud Google Gemini 2.5 Flash for high-speed inference, and local Ollama (`gemma3:4b`) for 100% offline, privacy-guaranteed air-gapped deployments."
+
+---
+
+## 10. ❓ Frequently Asked Questions & Troubleshooting
 
 #### Q: How do I switch between Dark Theme and Light Theme?
 Click the Sun/Moon toggle icon in the top navigation header. All tables, cards, badges, and modals dynamically adapt with high contrast readability.

@@ -39,7 +39,21 @@ An enterprise-grade, modern Accounting & ERP web application engineered for the 
 - **Role Hierarchy**:
   - `ADMIN`: Full system control & settings.
   - `ACCOUNTANT`: Accounting ledger, journal vouchers, reports, and payments.
-  - `USER`: Dedicated Customer Portal for viewing orders, downloading invoices, and registering payments.
+  - `USER`: Dedicated Customer Portal strictly isolated to customer's own invoices and receipts.
+- **Cross-Tenant Isolation**: Verified customer isolation blocking cross-customer data leakage on portal API routes and PDF invoice downloads.
+
+---
+
+## 🎬 5–7 Minute Judge Demo Flow
+
+For hackathon presentations, use this flow:
+1. **Executive Dashboard (`/`)**: Click `✨ Generate Business Summary` to demonstrate instant AI CFO insights on revenue, expenses, and cash reserves.
+2. **Commercial Sales & PDF Invoicing (`/sales`)**: Open order `SO-2026-001`, inspect the Indian GST tax breakdown (CGST/SGST/IGST), click **Download PDF** for server-rendered corporate invoice, and click `Explain This Transaction` for contextual AI explanation.
+3. **Double-Entry Parity (`/accounting`)**: Inspect the general ledger journal items showing strict debit/credit equality ($\sum \text{Dr} \equiv \sum \text{Cr}$ with ₹0.00 difference).
+4. **Perpetual Inventory & Procurement (`/stock`)**: Show low stock reorder alerts and 1-click Purchase Order creation.
+5. **Predictive Cash Flow (`/reports/cash-flow`)**: View the linear regression forecast with 95% Student's t confidence interval shading.
+6. **RBAC & Customer Portal (`/portal`)**: Login as `user` / `user123` to demonstrate strict boundary isolation (customer can only access their own invoices/receipts).
+7. **Hybrid AI (`/ai`)**: Demonstrate FinBot powered by Google Gemini 2.5 Flash and local Ollama (`gemma3:4b`) with zero-downtime offline fallback.
 
 ---
 
@@ -51,7 +65,8 @@ An enterprise-grade, modern Accounting & ERP web application engineered for the 
 - **Data Visualization**: Recharts
 - **Styling**: Vanilla Tailwind CSS (Dark Slate theme)
 - **Icons**: Lucide React
-- **Testing**: Vitest (195+ unit & integration tests)
+- **Testing**: Vitest (199 unit & integration tests, 100% passing)
+
 
 ---
 

@@ -89,8 +89,11 @@ export function middleware(request: NextRequest) {
 
   // USER trying to access admin/accounting routes → redirect to portal
   if (role === "USER") {
-    const allowedForUser = ["/portal", "/api/auth"];
-    const isAllowed = allowedForUser.some((p) => pathname.startsWith(p));
+    const isAllowed =
+      pathname.startsWith("/portal") ||
+      pathname.startsWith("/api/portal") ||
+      pathname.startsWith("/api/auth") ||
+      pathname.endsWith("/invoice-pdf");
     if (!isAllowed) {
       return NextResponse.redirect(new URL("/portal", request.url));
     }
