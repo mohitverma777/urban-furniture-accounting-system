@@ -11,6 +11,13 @@ import type { Product, ProductType } from "@/db/schema/products";
 export const productFormSchema = z.object({
   name: z.string().trim().min(1, "Product name is required"),
   type: z.enum(["GOODS", "SERVICE", "COMBO"]),
+  sku: z.string().trim().optional(),
+  gstRate: z
+    .number()
+    .refine((val) => [0, 5, 12, 18, 28].includes(val), {
+      message: "GST rate must be one of: 0%, 5%, 12%, 18%, 28%",
+    })
+    .optional(),
   salesPrice: z.number().min(0, "Sales price cannot be negative"),
   costPrice: z.number().min(0, "Cost price cannot be negative"),
   category: z.string().trim().optional(),

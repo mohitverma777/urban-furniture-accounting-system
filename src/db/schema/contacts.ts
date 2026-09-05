@@ -32,6 +32,9 @@ export const contacts = sqliteTable(
     state: text("state"),
     pincode: text("pincode"),
 
+    /** 15-digit Indian GSTIN */
+    gstin: text("gstin"),
+
     /** URL or relative path to profile image */
     profileImage: text("profile_image"),
 
@@ -52,6 +55,7 @@ export const contacts = sqliteTable(
     index("contacts_type_idx").on(table.type),
     index("contacts_email_idx").on(table.email),
     index("contacts_name_idx").on(table.name),
+    index("contacts_gstin_idx").on(table.gstin),
   ]
 );
 

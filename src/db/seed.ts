@@ -183,6 +183,21 @@ export async function seed() {
   } catch (e) {
     // Column already exists
   }
+  try {
+    db.run(sql`ALTER TABLE contacts ADD COLUMN gstin TEXT;`);
+  } catch (e) {
+    // Column already exists
+  }
+  try {
+    db.run(sql`ALTER TABLE products ADD COLUMN sku TEXT;`);
+  } catch (e) {
+    // Column already exists
+  }
+  try {
+    db.run(sql`ALTER TABLE products ADD COLUMN gst_rate INTEGER NOT NULL DEFAULT 18;`);
+  } catch (e) {
+    // Column already exists
+  }
 
   console.log("🧹 [Seed] Cleaning existing data in reverse dependency order...");
   // Use raw delete queries to ensure clean teardown regardless of current rows

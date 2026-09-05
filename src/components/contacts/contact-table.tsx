@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useMemo } from "react";
+import Link from "next/link";
 import {
   useReactTable,
   getCoreRowModel,
@@ -10,7 +11,7 @@ import {
   createColumnHelper,
   type SortingState,
 } from "@tanstack/react-table";
-import { Search, Filter, Edit, Archive, RotateCcw, UserPlus, Eye } from "lucide-react";
+import { Search, Filter, Edit, Archive, RotateCcw, UserPlus, Eye, UploadCloud } from "lucide-react";
 import type { Contact, ContactType } from "@/db/schema/contacts";
 import { ContactDialog } from "./contact-dialog";
 import { ContactDetailsDialog } from "./contact-details-dialog";
@@ -299,14 +300,23 @@ export function ContactTable({ initialContacts }: ContactTableProps) {
           </button>
         </div>
 
-        {/* Primary Action Button */}
-        <button
-          onClick={handleCreate}
-          className="w-full sm:w-auto flex items-center justify-center gap-2 px-4 py-2 bg-amber-500 hover:bg-amber-400 text-slate-950 font-semibold rounded-xl text-xs transition-colors shadow-md shrink-0"
-        >
-          <UserPlus className="w-4 h-4" />
-          <span>Add Contact</span>
-        </button>
+        {/* Actions: Import & Add Contact */}
+        <div className="flex items-center gap-2 w-full sm:w-auto shrink-0">
+          <Link
+            href="/import?type=customer"
+            className="flex items-center justify-center gap-1.5 px-3 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 font-semibold rounded-xl text-xs border border-slate-700 transition-colors shadow-sm"
+          >
+            <UploadCloud className="w-4 h-4 text-indigo-400" />
+            <span>Import</span>
+          </Link>
+          <button
+            onClick={handleCreate}
+            className="flex-1 sm:flex-initial flex items-center justify-center gap-2 px-4 py-2 bg-amber-500 hover:bg-amber-400 text-slate-950 font-semibold rounded-xl text-xs transition-colors shadow-md"
+          >
+            <UserPlus className="w-4 h-4" />
+            <span>Add Contact</span>
+          </button>
+        </div>
       </div>
 
       {/* TanStack Table Container */}

@@ -35,10 +35,17 @@ An enterprise-grade, modern Accounting & ERP web application engineered for the 
 - **Cost Center Management**: Categorize income and expenses by cost center or department.
 - **Budget vs Actual Variance**: Monitors planned vs actual spend with color-coded progress indicators (`On Track`, `Near Limit`, `Over Budget`).
 
+### 📁 Master-Data Excel/CSV Import
+- **Customer & Product Upload**: Bulk upload `.xlsx` and `.csv` files for Customer and Product master records.
+- **Safety & Validation**: Formula execution stripping, 5MB file-size limits, header auto-normalization, and cell-level schema validation (GSTIN, emails, rates, prices).
+- **Dual-Tier Duplicate Prevention**: In-batch duplicate detection plus database collision checks to prevent accidental overwrites.
+- **Preview & Confirmation**: Interactive preview grid with error/duplicate pills and explicit user confirmation before committing.
+- **Accounting Isolation**: Opening stock creates inventory `ADJUSTMENT` movements with zero unbalanced journal entries.
+
 ### 🔐 Role-Based Access Control (RBAC) & Customer Portal
 - **Role Hierarchy**:
   - `ADMIN`: Full system control & settings.
-  - `ACCOUNTANT`: Accounting ledger, journal vouchers, reports, and payments.
+  - `ACCOUNTANT`: Accounting ledger, journal vouchers, reports, master-data import, and payments.
   - `USER`: Dedicated Customer Portal strictly isolated to customer's own invoices and receipts.
 - **Cross-Tenant Isolation**: Verified customer isolation blocking cross-customer data leakage on portal API routes and PDF invoice downloads.
 
@@ -51,9 +58,10 @@ For hackathon presentations, use this flow:
 2. **Commercial Sales & PDF Invoicing (`/sales`)**: Open order `SO-2026-001`, inspect the Indian GST tax breakdown (CGST/SGST/IGST), click **Download PDF** for server-rendered corporate invoice, and click `Explain This Transaction` for contextual AI explanation.
 3. **Double-Entry Parity (`/accounting`)**: Inspect the general ledger journal items showing strict debit/credit equality ($\sum \text{Dr} \equiv \sum \text{Cr}$ with ₹0.00 difference).
 4. **Perpetual Inventory & Procurement (`/stock`)**: Show low stock reorder alerts and 1-click Purchase Order creation.
-5. **Predictive Cash Flow (`/reports/cash-flow`)**: View the linear regression forecast with 95% Student's t confidence interval shading.
-6. **RBAC & Customer Portal (`/portal`)**: Login as `user` / `user123` to demonstrate strict boundary isolation (customer can only access their own invoices/receipts).
-7. **Hybrid AI (`/ai`)**: Demonstrate FinBot powered by Google Gemini 2.5 Flash and local Ollama (`gemma3:4b`) with zero-downtime offline fallback.
+5. **Master Data Import (`/import`)**: Upload an Excel/CSV file with customer or product data, showcase the instant validation preview with duplicate flags, and commit the valid records.
+6. **Predictive Cash Flow (`/reports/cash-flow`)**: View the linear regression forecast with 95% Student's t confidence interval shading.
+7. **RBAC & Customer Portal (`/portal`)**: Login as `user` / `user123` to demonstrate strict boundary isolation (customer can only access their own invoices/receipts).
+8. **Hybrid AI (`/ai`)**: Demonstrate FinBot powered by Google Gemini 2.5 Flash and local Ollama (`gemma3:4b`) with zero-downtime offline fallback.
 
 ---
 
@@ -61,11 +69,12 @@ For hackathon presentations, use this flow:
 
 - **Framework**: Next.js 15 (App Router), React 19, TypeScript
 - **Database**: SQLite with Drizzle ORM
+- **Spreadsheet Processing**: `xlsx` (SheetJS)
 - **PDF Generation**: `@react-pdf/renderer`
 - **Data Visualization**: Recharts
 - **Styling**: Vanilla Tailwind CSS (Dark Slate theme)
 - **Icons**: Lucide React
-- **Testing**: Vitest (199 unit & integration tests, 100% passing)
+- **Testing**: Vitest (217 unit & integration tests, 100% passing)
 
 
 ---

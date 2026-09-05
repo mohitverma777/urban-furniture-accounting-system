@@ -79,6 +79,8 @@ export async function createProduct(input: ProductFormValues): Promise<Product> 
     .values({
       name: validated.name,
       type: validated.type,
+      sku: validated.sku || null,
+      gstRate: validated.gstRate ?? 18,
       salesPrice: Math.round(validated.salesPrice * 100),
       costPrice: Math.round(validated.costPrice * 100),
       category: validated.category || null,
@@ -129,6 +131,8 @@ export async function updateProduct(
     updates.costPrice = Math.round(validated.costPrice * 100);
   if (validated.category !== undefined) updates.category = validated.category || null;
   if (validated.imageUrl !== undefined) updates.imageUrl = validated.imageUrl || null;
+  if (validated.sku !== undefined) updates.sku = validated.sku || null;
+  if (validated.gstRate !== undefined) updates.gstRate = validated.gstRate;
 
   const [updated] = await db
     .update(products)

@@ -27,6 +27,15 @@ export const contactFormSchema = z.object({
   city: z.string().trim().optional(),
   state: z.string().trim().optional(),
   pincode: z.string().trim().optional(),
+  gstin: z
+    .string()
+    .trim()
+    .regex(
+      /^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}[Z]{1}[0-9A-Z]{1}$/,
+      "Invalid GSTIN format (15 alphanumeric characters, e.g. 27AAPCU0123M1ZV)"
+    )
+    .or(z.literal(""))
+    .optional(),
   profileImage: z.string().trim().optional(),
 });
 

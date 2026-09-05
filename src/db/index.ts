@@ -44,6 +44,29 @@ function createSqliteDb() {
   // Enforce foreign key constraints (SQLite disables them by default)
   sqlite.pragma("foreign_keys = ON");
 
+  // Self-healing schema migration for added columns across environments
+  try {
+    sqlite.exec("ALTER TABLE contacts ADD COLUMN gstin TEXT;");
+  } catch {}
+  try {
+    sqlite.exec("ALTER TABLE products ADD COLUMN sku TEXT;");
+  } catch {}
+  try {
+    sqlite.exec("ALTER TABLE products ADD COLUMN gst_rate INTEGER NOT NULL DEFAULT 18;");
+  } catch {}
+  try {
+    sqlite.exec("ALTER TABLE products ADD COLUMN image_url TEXT;");
+  } catch {}
+  try {
+    sqlite.exec("ALTER TABLE budgets ADD COLUMN responsible_person TEXT;");
+  } catch {}
+  try {
+    sqlite.exec("ALTER TABLE budgets ADD COLUMN status TEXT NOT NULL DEFAULT 'DRAFT';");
+  } catch {}
+  try {
+    sqlite.exec("ALTER TABLE budgets ADD COLUMN revision_of_id TEXT;");
+  } catch {}
+
   return drizzleBetterSqlite(sqlite, { schema });
 }
 

@@ -39,6 +39,12 @@ export const products = sqliteTable(
     /** Product Image URL */
     imageUrl: text("image_url"),
 
+    /** Stock Keeping Unit (SKU) code */
+    sku: text("sku"),
+
+    /** Standard GST Rate percentage: 0, 5, 12, 18, 28 */
+    gstRate: integer("gst_rate").notNull().default(18),
+
     /** Soft archive flag */
     isArchived: integer("is_archived", { mode: "boolean" })
       .notNull()
@@ -56,6 +62,7 @@ export const products = sqliteTable(
     index("products_type_idx").on(table.type),
     index("products_category_idx").on(table.category),
     index("products_name_idx").on(table.name),
+    index("products_sku_idx").on(table.sku),
   ]
 );
 

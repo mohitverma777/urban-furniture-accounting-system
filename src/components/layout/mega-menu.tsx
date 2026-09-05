@@ -23,6 +23,7 @@ import {
   BarChart3,
   Sparkles,
   History,
+  UploadCloud,
   X,
 } from "lucide-react";
 
@@ -80,6 +81,7 @@ export function NavigationMegaMenu() {
     { title: "Chart of Account", href: "/accounting", icon: BookOpen },
     { title: "Journals", href: "/accounting", icon: BookMarked },
     { title: "Journal Entries", href: "/accounting", icon: Layers },
+    { title: "Data Import", href: "/import", icon: UploadCloud },
   ];
 
   const reportLinks = [

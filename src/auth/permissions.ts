@@ -59,6 +59,8 @@ export const ROLE_PERMISSIONS: Record<string, AppRole[]> = {
   "/budgets": ["ADMIN", "ACCOUNTANT"],
   "/reports": ["ADMIN", "ACCOUNTANT"],
   "/ai": ["ADMIN", "ACCOUNTANT"],
+  "/import": ["ADMIN", "ACCOUNTANT"],
+  "/api/import": ["ADMIN", "ACCOUNTANT"],
 
   // Portal — USER only (also accessible by ADMIN/ACCOUNTANT for testing)
   "/portal": ["ADMIN", "ACCOUNTANT", "USER"],

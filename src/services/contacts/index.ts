@@ -81,6 +81,7 @@ export async function createContact(input: ContactFormValues): Promise<Contact> 
       city: validated.city || null,
       state: validated.state || null,
       pincode: validated.pincode || null,
+      gstin: validated.gstin || null,
       profileImage: validated.profileImage || null,
       isArchived: false,
     })

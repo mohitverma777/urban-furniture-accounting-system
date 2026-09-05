@@ -14,9 +14,9 @@ import {
   BookOpen,
   PieChart,
   BarChart3,
-  Server,
   Building2,
   Sparkles,
+  UploadCloud,
 } from "lucide-react";
 
 export interface NavItem {
@@ -40,9 +40,9 @@ export const NAV_ITEMS: NavItem[] = [
   { name: "Accounting", href: "/accounting", icon: BookOpen, roles: ["ADMIN", "ACCOUNTANT"] },
   { name: "Budgets", href: "/budgets", icon: PieChart, roles: ["ADMIN", "ACCOUNTANT"] },
   { name: "Reports", href: "/reports", icon: BarChart3, roles: ["ADMIN", "ACCOUNTANT"] },
+  { name: "Data Import", href: "/import", icon: UploadCloud, roles: ["ADMIN", "ACCOUNTANT"] },
   { name: "User Management", href: "/admin/users", icon: Users, roles: ["ADMIN"] },
   { name: "AI Assistant", href: "/ai", icon: Sparkles, roles: ["ADMIN", "ACCOUNTANT", "USER"] },
-  { name: "System", href: "/diagnostics", icon: Server, roles: ["ADMIN", "ACCOUNTANT"] },
 ];
 
 export function Sidebar() {

@@ -16,6 +16,7 @@
    - [Workflow C: Perpetual Inventory & Reorder Alerts](#workflow-c-perpetual-inventory--reorder-alerts)
    - [Workflow D: Double-Entry Ledger & Financial Statements](#workflow-d-double-entry-ledger--financial-statements)
    - [Workflow E: Indian GST Compliance & Tax Reports](#workflow-e-indian-gst-compliance--tax-reports)
+   - [Workflow F: Master-Data Excel/CSV Import](#workflow-f-master-data-excelcsv-import-customers--products)
 6. [🤖 AI Intelligence Suite: How & When to Use](#6--ai-intelligence-suite-how--when-to-use)
    - [AI Executive Business Summary](#-ai-executive-business-summary)
    - [Contextual AI "Why?" Explanations](#-contextual-ai-why-explanations)
@@ -64,6 +65,7 @@ Use this directory to quickly navigate to any module:
 | `/reports/gst` | **Indian GST Summary** | Monthly GSTR-style breakdown: Output Tax vs Input Tax Credit (ITC) | Accountant, Admin |
 | `/reports/cash-flow` | **Predictive Cash Flow** | Linear regression forecast with 95% confidence intervals | Admin, Accountant |
 | `/budgets` | **Budgets & Cost Centers** | Departmental analytic accounts with spend limit alerts | Admin, Accountant |
+| `/import` | **Master Data Import** | Bulk CSV/XLSX import for Customers & Products with preview & duplicate prevention | Admin, Accountant |
 | `/ai` | **AI Assistant** | "Talk to Your Ledger" multi-turn conversational financial agent | All Roles |
 | `/admin/users` | **User Management** | Create system credentials, toggle active status, reset passwords | Admin Only |
 | `/portal` | **Customer Portal** | Self-service invoice downloads, receipts, statement reconciliation | Customer (User) |
@@ -208,6 +210,25 @@ Open **[http://localhost:3000](http://localhost:3000)** in your browser and log 
    - **Outward Taxable Supplies**: Output IGST, CGST, and SGST split by rate slab (0%, 5%, 12%, 18%).
    - **Inward Eligible ITC**: Input tax credits from verified vendor bills.
    - **Net Tax Liability Banner**: Exact tax payable to the government or net refund claimable.
+
+---
+
+### Workflow F: Master-Data Excel/CSV Import (Customers & Products)
+1. Navigate to `/import` (or click **Import** directly from `/contacts` or `/products`).
+2. Select your desired tab: **Customers** or **Products & Inventory**.
+3. **Step 1 — Download Official Template**: Click **Download CSV** or **Download Excel (.xlsx)** pre-populated with validated sample records and format rules.
+4. **Step 2 — Upload Spreadsheet**: Drag & drop or select your `.xlsx` or `.csv` file (up to 5 MB).
+   - Spreadsheet parser automatically strips formula injection attempts and normalizes headers.
+   - Dual-tier duplicate checks run against both other rows in the file and existing database records.
+5. **Step 3 — Interactive Validation Preview**:
+   - Inspect KPI cards: **Total Rows**, **Ready to Import**, **Errors**, and **Duplicates**.
+   - Filter rows by `All`, `Valid`, `Errors`, or `Duplicates`.
+   - Review field-level error pills with exact row numbers (e.g. `Row 12 — SKU: SKU already exists`).
+6. **Step 4 — Confirmation & Commit**:
+   - Click **Confirm & Import Valid Rows**.
+   - Review confirmation modal highlighting skipped error rows.
+   - Only validated records are committed. Opening stock records `ADJUSTMENT` inventory movements with zero unbalanced journal entries.
+   - Click **View List** to immediately inspect newly imported records.
 
 ---
 

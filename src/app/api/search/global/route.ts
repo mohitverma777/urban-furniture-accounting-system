@@ -27,6 +27,7 @@ const STATIC_NAVIGATION: SearchResultItem[] = [
   { id: "nav-gst", title: "Indian GST Compliance Report", subtitle: "Monthly tax slabs, IGST, CGST, SGST", category: "NAVIGATION", url: "/reports/gst" },
   { id: "nav-cashflow", title: "AI Cash Flow Forecast", subtitle: "Linear regression with 95% confidence bands", category: "NAVIGATION", url: "/reports/cash-flow" },
   { id: "nav-budgets", title: "Budgets & Cost Centers", subtitle: "Analytic accounts, budget variances", category: "NAVIGATION", url: "/budgets" },
+  { id: "nav-import", title: "Master Data Import", subtitle: "Bulk import customers and products from Excel/CSV", category: "NAVIGATION", url: "/import" },
   { id: "nav-ai", title: "AI Financial Assistant", subtitle: "Talk to Your Ledger (Gemma 3:4B / Gemini)", category: "NAVIGATION", url: "/ai" },
   { id: "nav-users", title: "User Management & RBAC", subtitle: "System users, roles, security credentials", category: "NAVIGATION", url: "/admin/users" },
 ];
