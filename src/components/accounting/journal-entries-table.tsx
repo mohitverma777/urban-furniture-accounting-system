@@ -8,6 +8,7 @@ import type { JournalEntryListItem, JournalSummaryItem } from "@/services/accoun
 import { EmptyState } from "@/components/common/empty-state";
 import { JournalEntryDetailModal } from "./journal-entry-detail-modal";
 import { JournalEntryFormModal } from "./journal-entry-form-modal";
+import { JournalTrendSparkline } from "./journal-trend-sparkline";
 
 export interface JournalEntriesTableProps {
   initialEntries: JournalEntryListItem[];
@@ -60,6 +61,9 @@ export function JournalEntriesTable({
 
   return (
     <div className="space-y-6">
+      {/* Daily Debit Volume Trend Sparkline & Velocity Indicator */}
+      <JournalTrendSparkline entries={filteredEntries} />
+
       {/* Top Controls & Filter Bar */}
       <div className="bg-slate-900/60 p-4 rounded-2xl border border-slate-800 backdrop-blur-sm space-y-3 sm:space-y-0 sm:flex sm:items-center sm:justify-between sm:gap-4">
         {/* Reference / Search */}

@@ -39,5 +39,8 @@ export * from "./payments";
 // Inventory
 export * from "./stock";
 
+// Audit Trail & Changelogs
+export * from "./audit";
+
 // Drizzle relational query definitions (must come last — references all tables)
 export * from "./relations";

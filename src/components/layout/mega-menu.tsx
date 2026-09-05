@@ -22,6 +22,7 @@ import {
   TrendingUp,
   BarChart3,
   Sparkles,
+  History,
   X,
 } from "lucide-react";
 
@@ -87,6 +88,7 @@ export function NavigationMegaMenu() {
     { title: "Profit and Loss", href: "/reports/profit-loss", icon: TrendingUp },
     { title: "GST Tax Summary", href: "/reports/gst", icon: Receipt },
     { title: "Budget Report", href: "/budgets", icon: BarChart3 },
+    { title: "Audit Trail", href: "/audit-log", icon: History },
   ];
 
   return (

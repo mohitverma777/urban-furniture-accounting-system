@@ -20,6 +20,7 @@ import {
 import { isProductAvailableForTransaction } from "@/services/products";
 import { postCustomerInvoice } from "@/services/accounting";
 import { recordStockMovement } from "@/services/stock";
+import { recordAuditLog } from "@/services/audit";
 import { eq, and, desc, count, like } from "drizzle-orm";
 import { z } from "zod";
 
@@ -122,7 +123,7 @@ export async function createSalesOrder(input: CreateSalesOrderInput): Promise<Or
   const orderNumber = await generateSalesOrderNumber();
 
   // Database transaction for atomic insert
-  return db.transaction((tx) => {
+  const res = await db.transaction((tx) => {
     const invDate = validated.invoiceDate ? new Date(validated.invoiceDate) : new Date();
     const dueDate = validated.dueDate
       ? new Date(validated.dueDate)
@@ -158,6 +159,23 @@ export async function createSalesOrder(input: CreateSalesOrderInput): Promise<Or
 
     return newOrder;
   });
+
+  // Record Audit Trail event
+  await recordAuditLog({
+    entityType: "ORDER",
+    entityId: res.id,
+    action: "CREATE",
+    changedBy: "Sales Manager",
+    newValue: {
+      orderNumber: res.orderNumber,
+      type: res.type,
+      totalAmount: res.totalAmount,
+      contactId: res.contactId,
+      status: res.status,
+    },
+  });
+
+  return res;
 }
 
 /**
@@ -178,6 +196,8 @@ export async function convertOrderToInvoice(orderId: string): Promise<Order> {
     throw new Error(`Sales Order '${order.orderNumber}' is already in status '${order.status}'`);
   }
 
+  const previousStatus = order.status;
+
   // 1. Post double-entry accounting entry (Debit Debtors, Credit Sales Income, Credit Tax)
   await postCustomerInvoice({ orderId });
 
@@ -194,6 +214,17 @@ export async function convertOrderToInvoice(orderId: string): Promise<Order> {
 
   // Fetch updated order status
   const [updatedOrder] = await db.select().from(orders).where(eq(orders.id, orderId));
+
+  // Record Audit Trail status change event
+  await recordAuditLog({
+    entityType: "ORDER",
+    entityId: orderId,
+    action: "STATUS_CHANGE",
+    changedBy: "Accountant",
+    oldValue: { status: previousStatus },
+    newValue: { status: updatedOrder.status, ledgerPosted: true },
+  });
+
   return updatedOrder;
 }
 
