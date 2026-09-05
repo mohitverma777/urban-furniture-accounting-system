@@ -34,6 +34,7 @@ export function CommandPalette() {
   const router = useRouter();
   const inputRef = useRef<HTMLInputElement>(null);
   const listRef = useRef<HTMLDivElement>(null);
+  const modalRef = useRef<HTMLDivElement>(null);
 
   // Global Ctrl+K / Cmd+K listener
   useEffect(() => {
@@ -50,6 +51,24 @@ export function CommandPalette() {
 
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [isOpen]);
+
+  // Close on click outside modal
+  useEffect(() => {
+    if (!isOpen) return;
+
+    const handleClickOutside = (e: MouseEvent | TouchEvent) => {
+      if (modalRef.current && !modalRef.current.contains(e.target as Node)) {
+        setIsOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    document.addEventListener("touchstart", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+      document.removeEventListener("touchstart", handleClickOutside);
+    };
   }, [isOpen]);
 
   // Focus input when opened
@@ -156,8 +175,19 @@ export function CommandPalette() {
 
       {/* Modal Overlay */}
       {isOpen && (
-        <div className="fixed inset-0 z-50 flex items-start justify-center pt-16 sm:pt-24 p-4 bg-slate-950/80 backdrop-blur-md animate-in fade-in duration-150">
-          <div className="relative w-full max-w-2xl bg-slate-900 border border-slate-800 rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[80vh]">
+        <div
+          onClick={(e) => {
+            if (e.target === e.currentTarget) {
+              setIsOpen(false);
+            }
+          }}
+          className="fixed inset-0 z-50 flex items-start justify-center pt-16 sm:pt-24 p-4 bg-slate-950/80 backdrop-blur-md animate-in fade-in duration-150"
+        >
+          <div
+            ref={modalRef}
+            onClick={(e) => e.stopPropagation()}
+            className="relative w-full max-w-2xl bg-slate-900 border border-slate-800 rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[80vh]"
+          >
             {/* Search Input Bar */}
             <div className="flex items-center gap-3 px-4 py-3.5 border-b border-slate-800 bg-slate-950/70 shrink-0">
               <Search className="w-5 h-5 text-amber-500 shrink-0" />
@@ -173,13 +203,28 @@ export function CommandPalette() {
               {loading && <Loader2 className="w-4 h-4 text-amber-500 animate-spin shrink-0" />}
               {query && !loading && (
                 <button
+                  type="button"
                   onClick={() => setQuery("")}
                   className="p-1 text-slate-400 hover:text-slate-200"
+                  title="Clear query"
                 >
                   <X className="w-4 h-4" />
                 </button>
               )}
-              <kbd className="hidden sm:inline-block px-2 py-0.5 rounded bg-slate-800 text-[10px] font-mono font-semibold text-slate-400 border border-slate-700">
+              <button
+                type="button"
+                onClick={() => setIsOpen(false)}
+                className="p-1 rounded text-slate-400 hover:text-slate-200 hover:bg-slate-800 transition-colors"
+                title="Close (Esc or click outside)"
+                aria-label="Close search"
+              >
+                <X className="w-4 h-4" />
+              </button>
+              <kbd
+                onClick={() => setIsOpen(false)}
+                className="hidden sm:inline-block px-2 py-0.5 rounded bg-slate-800 text-[10px] font-mono font-semibold text-slate-400 border border-slate-700 cursor-pointer hover:bg-slate-700"
+                title="Press Esc or click outside to close"
+              >
                 ESC
               </kbd>
             </div>
