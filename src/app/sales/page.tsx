@@ -3,7 +3,7 @@ import { getSalesOrders } from "@/services/sales";
 import { getContacts } from "@/services/contacts";
 import { getProducts } from "@/services/products";
 import { EmptyState } from "@/components/common/empty-state";
-import { ShoppingCart } from "lucide-react";
+import { ShoppingCart, FileDown } from "lucide-react";
 import Link from "next/link";
 import { SalesOrderClientWrapper } from "@/components/sales/sales-order-client-wrapper";
 
@@ -40,7 +40,7 @@ export default async function SalesPage() {
                 <th className="p-4">Date</th>
                 <th className="p-4">Status</th>
                 <th className="p-4 text-right">Total Amount</th>
-                <th className="p-4 text-right">Action</th>
+                <th className="p-4 text-right">Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-800/60">
@@ -79,12 +79,24 @@ export default async function SalesPage() {
                       ₹{(so.totalAmount / 100).toLocaleString("en-IN")}
                     </td>
                     <td className="p-4 text-right">
-                      <Link
-                        href={`/sales/${so.id}`}
-                        className="px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-medium text-amber-400 transition-colors"
-                      >
-                        View Invoice
-                      </Link>
+                      <div className="flex items-center justify-end gap-2">
+                        <a
+                          href={`/api/sales/${so.id}/invoice-pdf`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-medium text-slate-200 hover:text-white transition-colors border border-slate-700 shadow-sm"
+                          title="Export PDF Invoice"
+                        >
+                          <FileDown className="w-3.5 h-3.5 text-amber-400" />
+                          <span>PDF</span>
+                        </a>
+                        <Link
+                          href={`/sales/${so.id}`}
+                          className="px-3 py-1.5 rounded-xl bg-amber-500/10 hover:bg-amber-500/20 text-xs font-medium text-amber-400 transition-colors border border-amber-500/20"
+                        >
+                          View
+                        </Link>
+                      </div>
                     </td>
                   </tr>
                 );

@@ -8,6 +8,7 @@ import { BudgetUtilization } from "@/components/dashboard/budget-utilization";
 import { StockSnapshot } from "@/components/dashboard/stock-snapshot";
 import { TalkToLedgerCard } from "@/components/dashboard/talk-to-ledger-card";
 import { AuditLedgerCard } from "@/components/dashboard/audit-ledger-card";
+import { LowStockAlertWidget } from "@/components/dashboard/low-stock-alert-widget";
 import {
   TrendingUp,
   TrendingDown,
@@ -38,6 +39,9 @@ export default async function DashboardPage() {
           </span>
         }
       />
+
+      {/* Low Stock & Reorder Alert Banner */}
+      <LowStockAlertWidget alerts={metrics.lowStockAlerts} />
 
       {/* 6 Core Financial KPI Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">

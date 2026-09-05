@@ -21,6 +21,7 @@ import {
   FileCheck,
   TrendingUp,
   BarChart3,
+  Sparkles,
   X,
 } from "lucide-react";
 
@@ -81,8 +82,10 @@ export function NavigationMegaMenu() {
   ];
 
   const reportLinks = [
+    { title: "AI Cash Flow Forecast", href: "/reports/cash-flow-forecast", icon: Sparkles },
     { title: "Balancesheet", href: "/reports/balance-sheet", icon: FileCheck },
     { title: "Profit and Loss", href: "/reports/profit-loss", icon: TrendingUp },
+    { title: "GST Tax Summary", href: "/reports/gst", icon: Receipt },
     { title: "Budget Report", href: "/budgets", icon: BarChart3 },
   ];
 

@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { FileCheck, CreditCard } from "lucide-react";
+import { FileCheck, CreditCard, FileDown } from "lucide-react";
 import { convertOrderToInvoiceAction } from "@/actions/sales";
 import { PaymentModal } from "./payment-modal";
 import { useToast } from "@/components/ui/toast";
@@ -46,6 +46,18 @@ export function SalesInvoiceActions({
 
   return (
     <div className="flex items-center gap-3">
+      {/* PDF Export Action */}
+      <a
+        href={`/api/sales/${orderId}/invoice-pdf`}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="flex items-center gap-2 px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 font-semibold rounded-xl text-sm transition-colors shadow-md hover:text-white"
+        title="Download or Print PDF Invoice"
+      >
+        <FileDown className="w-4 h-4 text-amber-400" />
+        <span>Download PDF</span>
+      </a>
+
       {status === "DRAFT" && (
         <button
           onClick={handleConvert}
@@ -77,3 +89,4 @@ export function SalesInvoiceActions({
     </div>
   );
 }
+

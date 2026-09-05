@@ -62,6 +62,19 @@ export interface StockSnapshotItem {
   isArchived: boolean;
 }
 
+export interface LowStockAlertItem {
+  id: string; // productId
+  name: string;
+  category: string | null;
+  type: "GOODS" | "COMBO";
+  currentQty: number;
+  reorderThreshold: number; // default 5 units
+  recommendedReorderQty: number; // e.g. Math.max(10, 15 - currentQty)
+  costPrice: number; // in Paise
+  estimatedReorderCost: number; // in Paise (recommendedReorderQty * costPrice)
+  status: "CRITICAL_OUT_OF_STOCK" | "LOW_STOCK_WARNING";
+}
+
 export interface DashboardMetrics {
   financials: DashboardFinancials;
   monthlyChart: MonthlyChartPoint[];
@@ -69,5 +82,7 @@ export interface DashboardMetrics {
   outstandingInvoices: OutstandingInvoiceItem[];
   budgetUtilization: BudgetUtilizationItem[];
   stockSnapshot: StockSnapshotItem[];
+  lowStockAlerts: LowStockAlertItem[];
+  lowStockCount: number;
   hasData: boolean;
 }

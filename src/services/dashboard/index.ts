@@ -2,8 +2,8 @@
  * src/services/dashboard/index.ts
  *
  * Dashboard Data Service — derives all financial KPIs, ledger metrics,
- * monthly charts, budget utilization, and stock snapshots directly
- * from double-entry accounting journal items and database records.
+ * monthly charts, budget utilization, stock snapshots, and low stock reorder alerts
+ * directly from double-entry accounting journal items and stock movements.
  */
 
 import { db } from "@/db";
@@ -17,6 +17,7 @@ import {
   analyticAccounts,
   products,
 } from "@/db/schema";
+import { getProductStockSummaries } from "@/services/stock/query";
 import { eq, inArray, sum, desc } from "drizzle-orm";
 import type {
   DashboardFinancials,
@@ -25,6 +26,7 @@ import type {
   OutstandingInvoiceItem,
   BudgetUtilizationItem,
   StockSnapshotItem,
+  LowStockAlertItem,
   DashboardMetrics,
 } from "./types";
 
@@ -226,7 +228,6 @@ export async function getDashboardMetrics(): Promise<DashboardMetrics> {
 
   const budgetUtilization: BudgetUtilizationItem[] = await Promise.all(
     rawBudgets.map(async (b) => {
-      // Sum practical expenses linked to this analytic account
       const [sumRes] = await db
         .select({ total: sum(journalItems.debit) })
         .from(journalItems)
@@ -249,22 +250,51 @@ export async function getDashboardMetrics(): Promise<DashboardMetrics> {
     })
   );
 
-  // 6. Fetch Stock Snapshot (Active Catalog Products)
-  const productList = await db
-    .select()
-    .from(products)
-    .where(eq(products.isArchived, false))
-    .limit(6);
+  // 6. Fetch Stock Snapshot & Low Stock Reorder Alerts
+  const stockSummaries = await getProductStockSummaries();
+  const dbProducts = await db.select().from(products).where(eq(products.isArchived, false));
+  const productPriceMap = new Map(dbProducts.map((p) => [p.id, p]));
 
-  const stockSnapshot: StockSnapshotItem[] = productList.map((p) => ({
-    id: p.id,
-    name: p.name,
-    category: p.category || "Uncategorized",
-    type: p.type,
-    salesPrice: p.salesPrice,
-    costPrice: p.costPrice,
-    isArchived: p.isArchived,
-  }));
+  const lowStockAlerts: LowStockAlertItem[] = [];
+
+  stockSummaries.forEach((s) => {
+    if (s.type === "SERVICE") return;
+
+    // Threshold: flag if currentQty <= 5 units (or negative stock)
+    const reorderThreshold = 5;
+    if (s.currentQty <= reorderThreshold) {
+      const prodMeta = productPriceMap.get(s.id);
+      const costPrice = prodMeta?.costPrice ?? 0;
+      const recommendedReorderQty = Math.max(10, 15 - s.currentQty);
+      const estimatedReorderCost = recommendedReorderQty * costPrice;
+
+      lowStockAlerts.push({
+        id: s.id,
+        name: s.name,
+        category: s.category,
+        type: s.type as "GOODS" | "COMBO",
+        currentQty: s.currentQty,
+        reorderThreshold,
+        recommendedReorderQty,
+        costPrice,
+        estimatedReorderCost,
+        status: s.currentQty <= 0 ? "CRITICAL_OUT_OF_STOCK" : "LOW_STOCK_WARNING",
+      });
+    }
+  });
+
+  const stockSnapshot: StockSnapshotItem[] = stockSummaries.slice(0, 6).map((s) => {
+    const prodMeta = productPriceMap.get(s.id);
+    return {
+      id: s.id,
+      name: s.name,
+      category: s.category || "Uncategorized",
+      type: s.type,
+      salesPrice: prodMeta?.salesPrice ?? 0,
+      costPrice: prodMeta?.costPrice ?? 0,
+      isArchived: s.isArchived,
+    };
+  });
 
   const hasData =
     totalRevenue > 0 ||
@@ -279,6 +309,8 @@ export async function getDashboardMetrics(): Promise<DashboardMetrics> {
     outstandingInvoices,
     budgetUtilization,
     stockSnapshot,
+    lowStockAlerts,
+    lowStockCount: lowStockAlerts.length,
     hasData,
   };
 }
