@@ -11,7 +11,7 @@ import {
   CartesianGrid,
   Legend,
 } from "recharts";
-import type { MonthlyChartPoint } from "@/services/dashboard";
+import type { MonthlyChartPoint } from "@/services/dashboard/types";
 
 export function RevenueExpenseChart({ data }: { data: MonthlyChartPoint[] }) {
   return (

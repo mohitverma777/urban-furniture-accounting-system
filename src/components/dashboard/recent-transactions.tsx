@@ -1,5 +1,5 @@
 import React from "react";
-import type { RecentTransactionItem } from "@/services/dashboard";
+import type { RecentTransactionItem } from "@/services/dashboard/types";
 import { ArrowUpRight, ArrowDownLeft } from "lucide-react";
 
 export function RecentTransactions({ items }: { items: RecentTransactionItem[] }) {

@@ -1,5 +1,5 @@
 import React from "react";
-import type { StockSnapshotItem } from "@/services/dashboard";
+import type { StockSnapshotItem } from "@/services/dashboard/types";
 
 export function StockSnapshot({ items }: { items: StockSnapshotItem[] }) {
   if (items.length === 0) {

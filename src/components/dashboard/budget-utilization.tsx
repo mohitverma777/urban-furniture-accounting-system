@@ -1,5 +1,5 @@
 import React from "react";
-import type { BudgetUtilizationItem } from "@/services/dashboard";
+import type { BudgetUtilizationItem } from "@/services/dashboard/types";
 
 export function BudgetUtilization({ items }: { items: BudgetUtilizationItem[] }) {
   if (items.length === 0) {

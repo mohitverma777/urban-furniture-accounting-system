@@ -12,7 +12,7 @@ import {
 } from "@tanstack/react-table";
 import { Search, Filter, Edit, Archive, RotateCcw, PackagePlus } from "lucide-react";
 import type { Product, ProductType } from "@/db/schema/products";
-import { canCreateStockMovement } from "@/services/products";
+import { canCreateStockMovement } from "@/services/products/schema";
 import { ProductDialog } from "./product-dialog";
 import { ConfirmDialog } from "@/components/common/confirm-dialog";
 import { EmptyState } from "@/components/common/empty-state";

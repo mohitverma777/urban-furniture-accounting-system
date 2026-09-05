@@ -1,5 +1,5 @@
 import React from "react";
-import type { OutstandingInvoiceItem } from "@/services/dashboard";
+import type { OutstandingInvoiceItem } from "@/services/dashboard/types";
 
 export function OutstandingInvoices({ items }: { items: OutstandingInvoiceItem[] }) {
   if (items.length === 0) {

@@ -7,7 +7,7 @@ import { X, PackagePlus, Edit3 } from "lucide-react";
 import {
   productFormSchema,
   type ProductFormValues,
-} from "@/services/products";
+} from "@/services/products/schema";
 import type { Product } from "@/db/schema/products";
 import { useToast } from "@/components/ui/toast";
 import { createProductAction, updateProductAction } from "@/actions/products";

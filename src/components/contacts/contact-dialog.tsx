@@ -7,7 +7,7 @@ import { X, UserPlus, Edit3 } from "lucide-react";
 import {
   contactFormSchema,
   type ContactFormValues,
-} from "@/services/contacts";
+} from "@/services/contacts/schema";
 import type { Contact } from "@/db/schema/contacts";
 import { useToast } from "@/components/ui/toast";
 import { createContactAction, updateContactAction } from "@/actions/contacts";
