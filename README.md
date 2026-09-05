@@ -1,36 +1,137 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 🛋️ Urban Furniture Accounting & ERP System
 
-## Getting Started
+An enterprise-grade, modern Accounting & ERP web application engineered for the **Urban Furniture** use-case. Built with **Next.js 15 App Router**, **TypeScript**, **Drizzle ORM**, and **SQLite**, featuring a **double-entry ledger engine**, **Indian GST compliance reports**, **predictive AI cash flow forecasting**, **one-click PDF invoice generation**, **low stock reorder alerts**, and **role-based access control**.
 
-First, run the development server:
+---
 
+## ✨ Key Features & Highlights
+
+### 📊 Double-Entry Accounting Core
+- **General Ledger**: Immutable double-entry journal items with debit/credit balance enforcement.
+- **Financial Statements**: Real-time **Profit & Loss (P&L)** statement and **Balance Sheet** derived strictly from ledger transactions.
+- **Chart of Accounts**: Standardized account classification across Assets (1000s), Liabilities (2000s), Equity (3000s), Income (4000s), and Expenses (5000s).
+
+### 🇮🇳 Indian GST Compliance Report
+- **Dedicated GST Summary Report**: Monthly IGST, CGST, and SGST breakdowns per tax rate slab (0%, 5%, 12%, 18%).
+- **Tax Position Breakdown**: Compares Output Tax (Sales) vs Input Tax Credit (Purchases) with net tax liability calculation.
+
+### 📄 One-Click PDF Invoice Export
+- **Server-Side Rendering**: Generates high-resolution corporate PDF invoices instantly via `@react-pdf/renderer` without external third-party services.
+- **Professional Formatting**: Includes Urban Furniture logo/branding, GSTIN (`27AAPCU0123M1ZV`), line items breakdown, GST split, bank transfer details, and payment status badges.
+
+### 🤖 AI-Powered Cash Flow Forecasting
+- **Linear Regression Engine**: Fits simple linear regression ($y = mx + c$) on General Ledger cash postings over historical months.
+- **95% Confidence Band**: Computes upper and lower 95% Student's t confidence bounds for 3-month future cash position predictions.
+- **Predictive AI Insights**: Analyzes burn rate, runway, and projected quarter-end cash reserves.
+
+### 📦 Low Stock & Reorder Alerts
+- **Perpetual Inventory Tracking**: Tracks stock-on-hand ($\text{Opening} + \text{Purchases} - \text{Sales} \pm \text{Adjustments}$).
+- **Automated Reorder Thresholds**: Detects items with stock $\le 5$ units or out-of-stock status.
+- **Procurement Loop**: Closed-loop workflow (SO $\to$ Stock Depletion $\to$ PO Suggestion) with one-click Purchase Order generation.
+
+### 📊 Analytic Accounts & Budget Variance
+- **Cost Center Management**: Categorize income and expenses by cost center or department.
+- **Budget vs Actual Variance**: Monitors planned vs actual spend with color-coded progress indicators (`On Track`, `Near Limit`, `Over Budget`).
+
+### 🔐 Role-Based Access Control (RBAC) & Customer Portal
+- **Role Hierarchy**:
+  - `ADMIN`: Full system control & settings.
+  - `ACCOUNTANT`: Accounting ledger, journal vouchers, reports, and payments.
+  - `USER`: Dedicated Customer Portal for viewing orders, downloading invoices, and registering payments.
+
+---
+
+## 🛠️ Technology Stack
+
+- **Framework**: Next.js 15 (App Router), React 19, TypeScript
+- **Database**: SQLite with Drizzle ORM
+- **PDF Generation**: `@react-pdf/renderer`
+- **Data Visualization**: Recharts
+- **Styling**: Vanilla Tailwind CSS (Dark Slate theme)
+- **Icons**: Lucide React
+- **Testing**: Vitest (195+ unit & integration tests)
+
+---
+
+## 🚀 Getting Started & Setup Instructions
+
+### Prerequisites
+- **Node.js**: v18.x or higher
+- **npm**: v9.x or higher
+
+### 1. Clone the Repository
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+git clone https://github.com/mohitverma777/urban-furniture-accounting-system.git
+cd urban-furniture-accounting-system
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### 2. Install Dependencies
+```bash
+npm install --legacy-peer-deps
+```
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### 3. Initialize & Seed Database
+The project utilizes SQLite with Drizzle ORM. Run the automated seed script to populate isolated test data, contacts, products, chart of accounts, double-entry vouchers, and budgets:
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+npm run db:push
+# or run seed scripts directly:
+npx tsx src/db/seed.ts
+```
 
-## Learn More
+### 4. Run Development Server
+```bash
+npm run dev
+```
+Open [http://localhost:3000](http://localhost:3000) in your browser.
 
-To learn more about Next.js, take a look at the following resources:
+---
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## 🔐 Seeded Test Login Credentials
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+| Role | Username / Email | Password | Access Rights |
+| :--- | :--- | :--- | :--- |
+| **Admin** | `admin` | `admin123` | Full ERP, Ledger, Users & Settings |
+| **Accountant** | `accountant` | `accountant123` | Accounting, Reports, Sales, Purchases, Budgets |
+| **Customer** | `user` | `user123` | Customer Portal (Invoices, Receipts, Statements) |
 
-## Deploy on Vercel
+---
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## 🧪 Running Automated Tests
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+The application includes a comprehensive Vitest test suite covering double-entry accounting math, GST calculations, budget variances, linear regression forecasting, and stock movements.
+
+```bash
+# Run all unit and integration tests
+npx vitest run
+
+# Run TypeScript type safety verification
+npx tsc --noEmit
+```
+
+---
+
+## 📁 Project Directory Structure
+
+```
+src/
+├── actions/             # Next.js Server Actions (Sales, Purchases, Payments, Budgets)
+├── ai/                  # AI LLM Tools, FinBot System Prompts & Audit Detectors
+├── app/                 # Next.js App Router (Pages, Customer Portal, API Routes)
+│   ├── api/             # PDF Export (/api/sales/[id]/invoice-pdf), Portal APIs
+│   ├── reports/         # P&L, Balance Sheet, GST Report, Cash Flow Forecast
+│   ├── sales/           # Sales Orders & Customer Invoice Detail Pages
+│   ├── purchases/       # Purchase Orders & Vendor Bills
+│   ├── budgets/         # Analytic Cost Centers & Budget Variance Reports
+│   └── portal/          # Customer Portal Views
+├── components/          # React UI Components (Dashboard, Reports, Sales, PDF)
+├── db/                  # Drizzle ORM Schemas, Migrations & Seeder Scripts
+├── infrastructure/      # System Diagnostics & Health Checkers
+└── services/            # Core Business Services (Accounting, Stock, Reports)
+```
+
+---
+
+## 📝 License
+
+Developed for the Odoo Hackathon — Urban Furniture Real-World Accounting & ERP Use Case.
