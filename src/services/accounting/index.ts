@@ -938,5 +938,27 @@ export function calculateOrderTotals(
   };
 }
 
+export interface CreateJournalInput {
+  name: string;
+  type: "SALES" | "PURCHASE" | "BANK" | "CASH";
+  defaultAccountId?: string | null;
+}
+
+export async function createJournal(input: CreateJournalInput) {
+  const [newJournal] = await db
+    .insert(journals)
+    .values({
+      id: crypto.randomUUID(),
+      name: input.name,
+      type: input.type,
+      defaultAccountId: input.defaultAccountId || null,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    })
+    .returning();
+
+  return newJournal;
+}
+
 export * from "./query";
 export * from "./anomaly-detector";

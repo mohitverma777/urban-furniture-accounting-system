@@ -5,6 +5,8 @@ import { useRouter } from "next/navigation";
 import { Menu, User, LogOut, ShieldCheck, UserCheck } from "lucide-react";
 import { Breadcrumbs } from "./breadcrumbs";
 import { MobileNav } from "./mobile-nav";
+import { NavigationMegaMenu } from "./mega-menu";
+import { ThemeToggle } from "@/components/common/theme-toggle";
 
 interface UserProfile {
   id: string;
@@ -67,9 +69,11 @@ export function Header() {
             <Menu className="w-5 h-5" />
           </button>
           <Breadcrumbs />
+          <NavigationMegaMenu />
         </div>
 
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-3">
+          <ThemeToggle />
           {/* User Profile & Role Info */}
           {user ? (
             <div className="flex items-center gap-3 pl-2 border-l border-slate-800">

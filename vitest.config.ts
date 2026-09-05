@@ -6,6 +6,11 @@ export default defineConfig({
     globals: true,
     environment: "node",
     fileParallelism: false,
+    globalSetup: ["./vitest.global-setup.ts"],
+    setupFiles: ["./vitest.setup.ts"],
+    env: {
+      SQLITE_DB_PATH: "./test.db",
+    },
   },
   resolve: {
     alias: {

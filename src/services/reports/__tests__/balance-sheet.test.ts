@@ -39,6 +39,20 @@ describe("Balance Sheet Report Service", () => {
     await db.delete(orderItems);
     await db.delete(orders);
 
+    const existingJournals = await db.select().from(journals);
+    if (!existingJournals.some((j) => j.type === "SALES")) {
+      const [salesAcc] = await db.select().from(accounts).where(eq(accounts.code, "4000"));
+      if (salesAcc) {
+        await db.insert(journals).values({ name: "Sales Journal", type: "SALES", defaultAccountId: salesAcc.id });
+      }
+    }
+    if (!existingJournals.some((j) => j.type === "PURCHASE")) {
+      const [purchAcc] = await db.select().from(accounts).where(eq(accounts.code, "5000"));
+      if (purchAcc) {
+        await db.insert(journals).values({ name: "Purchase Journal", type: "PURCHASE", defaultAccountId: purchAcc.id });
+      }
+    }
+
     const [cust] = await db
       .insert(contacts)
       .values({ name: "BS Customer", type: "CUSTOMER", email: "bs.cust@test.demo" })

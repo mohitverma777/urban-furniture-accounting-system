@@ -6,6 +6,7 @@ import {
   updateProduct,
   archiveProduct,
   unarchiveProduct,
+  getProductDetails,
   type ProductFormValues,
 } from "@/services/products";
 
@@ -60,6 +61,21 @@ export async function unarchiveProductAction(id: string) {
     return {
       success: false,
       error: error instanceof Error ? error.message : "Failed to restore product",
+    };
+  }
+}
+
+export async function getProductDetailsAction(id: string) {
+  try {
+    const details = await getProductDetails(id);
+    if (!details) {
+      return { success: false, error: "Product not found" };
+    }
+    return { success: true, details };
+  } catch (error) {
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : "Failed to fetch product details",
     };
   }
 }

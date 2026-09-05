@@ -36,6 +36,9 @@ export const products = sqliteTable(
     /** Freeform category label (e.g. "Sofas", "Dining Sets", "Accessories") */
     category: text("category"),
 
+    /** Product Image URL */
+    imageUrl: text("image_url"),
+
     /** Soft archive flag */
     isArchived: integer("is_archived", { mode: "boolean" })
       .notNull()

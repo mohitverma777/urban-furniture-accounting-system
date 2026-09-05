@@ -142,8 +142,47 @@ const DATES = {
 
 export async function seed() {
   console.log("🌱 [Seed] Applying migrations...");
-  const migrationsFolder = resolve(process.cwd(), "src/db/migrations");
-  migrate(db, { migrationsFolder });
+  try {
+    const migrationsFolder = resolve(process.cwd(), "src/db/migrations");
+    migrate(db, { migrationsFolder });
+  } catch (e) {
+    // Migration table might be up to date or already applied
+  }
+
+  try {
+    db.run(sql`CREATE TABLE IF NOT EXISTS users (
+      id TEXT PRIMARY KEY NOT NULL,
+      name TEXT NOT NULL,
+      login_id TEXT NOT NULL UNIQUE,
+      email TEXT NOT NULL UNIQUE,
+      password_hash TEXT NOT NULL,
+      role TEXT NOT NULL DEFAULT 'USER',
+      contact_id TEXT,
+      active INTEGER NOT NULL DEFAULT 1,
+      created_at INTEGER NOT NULL,
+      updated_at INTEGER NOT NULL
+    );`);
+  } catch (e) {}
+  try {
+    db.run(sql`ALTER TABLE products ADD COLUMN image_url TEXT;`);
+  } catch (e) {
+    // Column already exists
+  }
+  try {
+    db.run(sql`ALTER TABLE budgets ADD COLUMN responsible_person TEXT;`);
+  } catch (e) {
+    // Column already exists
+  }
+  try {
+    db.run(sql`ALTER TABLE budgets ADD COLUMN status TEXT NOT NULL DEFAULT 'DRAFT';`);
+  } catch (e) {
+    // Column already exists
+  }
+  try {
+    db.run(sql`ALTER TABLE budgets ADD COLUMN revision_of_id TEXT;`);
+  } catch (e) {
+    // Column already exists
+  }
 
   console.log("🧹 [Seed] Cleaning existing data in reverse dependency order...");
   // Use raw delete queries to ensure clean teardown regardless of current rows
@@ -231,6 +270,7 @@ export async function seed() {
       salesPrice: 850000, // ₹8,500.00
       costPrice: 450000, // ₹4,500.00
       category: "Chairs",
+      imageUrl: "https://images.unsplash.com/photo-1580481072645-022f9a6d8310?w=500&auto=format&fit=crop&q=80",
       createdAt: DATES.Jan01,
       updatedAt: DATES.Jan01,
     },
@@ -241,6 +281,7 @@ export async function seed() {
       salesPrice: 3200000, // ₹32,000.00
       costPrice: 1800000, // ₹18,000.00
       category: "Tables",
+      imageUrl: "https://images.unsplash.com/photo-1615066390971-03e4e1c36ddf?w=500&auto=format&fit=crop&q=80",
       createdAt: DATES.Jan01,
       updatedAt: DATES.Jan01,
     },
@@ -251,6 +292,7 @@ export async function seed() {
       salesPrice: 2400000, // ₹24,000.00
       costPrice: 1300000, // ₹13,000.00
       category: "Desks",
+      imageUrl: "https://images.unsplash.com/photo-1518455027359-f3f8164ba6bd?w=500&auto=format&fit=crop&q=80",
       createdAt: DATES.Jan01,
       updatedAt: DATES.Jan01,
     },
@@ -261,6 +303,7 @@ export async function seed() {
       salesPrice: 4500000, // ₹45,000.00
       costPrice: 2500000, // ₹25,000.00
       category: "Living Room",
+      imageUrl: "https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=500&auto=format&fit=crop&q=80",
       createdAt: DATES.Jan01,
       updatedAt: DATES.Jan01,
     },
@@ -271,6 +314,7 @@ export async function seed() {
       salesPrice: 150000, // ₹1,500.00
       costPrice: 50000, // ₹500.00
       category: "Services",
+      imageUrl: null,
       createdAt: DATES.Jan01,
       updatedAt: DATES.Jan01,
     },
@@ -642,6 +686,39 @@ export async function seed() {
   console.log("📦 [Seed] Seeding Warehouse Stock Movements...");
   // Tracks perpetual inventory ledger for GOODS
   await db.insert(stockMovements).values([
+    // Baseline Opening Stock
+    {
+      id: "sm000000-0000-4000-8000-000000000000",
+      productId: SEED_IDS.productOfficeChair,
+      type: "ADJUSTMENT",
+      quantity: 20,
+      referenceId: "OPENING-STOCK",
+      createdAt: DATES.Jan01,
+    },
+    {
+      id: "sm000000-0000-4000-8000-00000000000a",
+      productId: SEED_IDS.productDiningTable,
+      type: "ADJUSTMENT",
+      quantity: 15,
+      referenceId: "OPENING-STOCK",
+      createdAt: DATES.Jan01,
+    },
+    {
+      id: "sm000000-0000-4000-8000-00000000000b",
+      productId: SEED_IDS.productExecutiveDesk,
+      type: "ADJUSTMENT",
+      quantity: 10,
+      referenceId: "OPENING-STOCK",
+      createdAt: DATES.Jan01,
+    },
+    {
+      id: "sm000000-0000-4000-8000-00000000000c",
+      productId: SEED_IDS.productSofa,
+      type: "ADJUSTMENT",
+      quantity: 8,
+      referenceId: "OPENING-STOCK",
+      createdAt: DATES.Jan01,
+    },
     // Inbound from PO-2026-0001
     {
       id: "sm000000-0000-4000-8000-000000000001",

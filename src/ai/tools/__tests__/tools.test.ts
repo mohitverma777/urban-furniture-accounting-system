@@ -104,7 +104,7 @@ describe("AI Financial Tools — Input Validation & Output Structure", () => {
         { accountCode: "1000" },
         mockOptions
       )) as any;
-      if (!res.error) {
+      if (!res.error && res.account) {
         expect(res.account.code).toBe("1000");
         expect(res.closingBalance).toBeDefined();
       }

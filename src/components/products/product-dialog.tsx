@@ -3,7 +3,7 @@
 import React, { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { X, PackagePlus, Edit3 } from "lucide-react";
+import { X, PackagePlus, Edit3, Upload } from "lucide-react";
 import {
   productFormSchema,
   type ProductFormValues,
@@ -32,6 +32,8 @@ export function ProductDialog({
     register,
     handleSubmit,
     reset,
+    watch,
+    setValue,
     formState: { errors, isSubmitting },
   } = useForm<ProductFormValues>({
     resolver: zodResolver(productFormSchema),
@@ -41,8 +43,25 @@ export function ProductDialog({
       salesPrice: 0,
       costPrice: 0,
       category: "",
+      imageUrl: "",
     },
   });
+
+  const imageUrlValue = watch("imageUrl");
+
+  const handleImageFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setValue("imageUrl", reader.result as string, {
+          shouldValidate: true,
+          shouldDirty: true,
+        });
+      };
+      reader.readAsDataURL(file);
+    }
+  };
 
   useEffect(() => {
     if (initialData) {
@@ -52,6 +71,7 @@ export function ProductDialog({
         salesPrice: initialData.salesPrice / 100,
         costPrice: initialData.costPrice / 100,
         category: initialData.category ?? "",
+        imageUrl: initialData.imageUrl ?? "",
       });
     } else {
       reset({
@@ -60,6 +80,7 @@ export function ProductDialog({
         salesPrice: 0,
         costPrice: 0,
         category: "",
+        imageUrl: "",
       });
     }
   }, [initialData, reset, isOpen]);
@@ -193,6 +214,77 @@ export function ProductDialog({
               placeholder="e.g. Office Furniture / Services / Seating"
               className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2 text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-1 focus:ring-amber-400"
             />
+          </div>
+
+          {/* Initial Opening Stock Qty (only for new GOODS / COMBO items) */}
+          {!isEditing && watch("type") !== "SERVICE" && (
+            <div className="space-y-1">
+              <label className="text-xs font-semibold text-slate-300">
+                Initial Opening Stock Quantity (Units)
+              </label>
+              <input
+                {...register("openingStock", { valueAsNumber: true })}
+                type="number"
+                min="0"
+                placeholder="e.g. 25"
+                className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2 text-sm font-mono text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-1 focus:ring-amber-400"
+              />
+              {errors.openingStock && (
+                <p className="text-xs text-rose-400 font-medium">{errors.openingStock.message}</p>
+              )}
+            </div>
+          )}
+
+          {/* Product Image */}
+          <div className="space-y-1">
+            <label className="text-xs font-semibold text-slate-300">Product Picture / Image</label>
+            <div className="flex items-center gap-3">
+              {imageUrlValue ? (
+                <img
+                  src={imageUrlValue}
+                  alt="Product Preview"
+                  className="w-12 h-12 rounded-xl object-cover border border-amber-500/40 bg-slate-950 shrink-0"
+                  onError={(e) => {
+                    (e.currentTarget as HTMLElement).style.display = "none";
+                  }}
+                />
+              ) : (
+                <div className="w-12 h-12 rounded-xl bg-slate-800 border border-slate-700 flex items-center justify-center text-[10px] font-semibold text-slate-400 shrink-0">
+                  No Img
+                </div>
+              )}
+              <div className="flex-1 space-y-1.5">
+                <div className="flex items-center gap-2">
+                  <label className="cursor-pointer inline-flex items-center gap-1.5 px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-medium rounded-xl border border-slate-700 transition-colors">
+                    <Upload className="w-3.5 h-3.5 text-amber-400" />
+                    <span>Upload Image File</span>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      className="hidden"
+                      onChange={handleImageFileChange}
+                    />
+                  </label>
+                  {imageUrlValue && (
+                    <button
+                      type="button"
+                      onClick={() => setValue("imageUrl", "")}
+                      className="px-2 py-1 text-[11px] font-medium text-rose-400 hover:text-rose-300 transition-colors"
+                    >
+                      Remove
+                    </button>
+                  )}
+                </div>
+                <input
+                  {...register("imageUrl")}
+                  placeholder="Or paste Image URL (https://...)"
+                  className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-1.5 text-xs text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-1 focus:ring-amber-400"
+                />
+              </div>
+            </div>
+            {errors.imageUrl && (
+              <p className="text-xs text-rose-400 font-medium">{errors.imageUrl.message}</p>
+            )}
           </div>
 
           {/* Footer buttons */}

@@ -6,7 +6,9 @@
 
 import { db } from "@/db";
 import { products, type Product } from "@/db/schema/products";
-import { eq, and, like, or } from "drizzle-orm";
+import { orderItems, orders } from "@/db/schema/orders";
+import { getProductStockOnHand } from "@/services/stock";
+import { eq, and, like, or, desc } from "drizzle-orm";
 import {
   productFormSchema,
   type ProductFormValues,
@@ -80,9 +82,25 @@ export async function createProduct(input: ProductFormValues): Promise<Product> 
       salesPrice: Math.round(validated.salesPrice * 100),
       costPrice: Math.round(validated.costPrice * 100),
       category: validated.category || null,
+      imageUrl: validated.imageUrl || null,
       isArchived: false,
     })
     .returning();
+
+  if (
+    (validated.type === "GOODS" || validated.type === "COMBO") &&
+    validated.openingStock &&
+    validated.openingStock > 0
+  ) {
+    const { stockMovements } = await import("@/db/schema/stock");
+    await db.insert(stockMovements).values({
+      productId: newProduct.id,
+      type: "ADJUSTMENT",
+      quantity: validated.openingStock,
+      referenceId: "OPENING-STOCK",
+      createdAt: new Date(),
+    });
+  }
 
   return newProduct;
 }
@@ -110,6 +128,7 @@ export async function updateProduct(
   if (validated.costPrice !== undefined)
     updates.costPrice = Math.round(validated.costPrice * 100);
   if (validated.category !== undefined) updates.category = validated.category || null;
+  if (validated.imageUrl !== undefined) updates.imageUrl = validated.imageUrl || null;
 
   const [updated] = await db
     .update(products)
@@ -160,4 +179,82 @@ export async function unarchiveProduct(id: string): Promise<Product> {
     .returning();
 
   return restored;
+}
+
+export interface ProductTransactionHistoryItem {
+  id: string;
+  orderNumber: string;
+  orderType: "PO" | "SO";
+  invoiceDate: Date | null;
+  quantity: number;
+  unitPricePaise: number;
+  lineTotalPaise: number;
+}
+
+export interface ProductDetails {
+  product: Product;
+  stockOnHand: number;
+  transactions: ProductTransactionHistoryItem[];
+  summary: {
+    totalUnitsSold: number;
+    totalUnitsPurchased: number;
+    totalSalesRevenuePaise: number;
+    marginPercentage: number;
+  };
+}
+
+/**
+ * Fetch detailed product master data, stock on hand, and transaction history.
+ */
+export async function getProductDetails(id: string): Promise<ProductDetails | null> {
+  const product = await getProductById(id);
+  if (!product) return null;
+
+  const stockOnHand = await getProductStockOnHand(id);
+
+  // Fetch line items for this product joined with order headers
+  const items = await db
+    .select({
+      id: orderItems.id,
+      quantity: orderItems.quantity,
+      unitPricePaise: orderItems.unitPrice,
+      lineTotalPaise: orderItems.lineTotal,
+      orderNumber: orders.orderNumber,
+      orderType: orders.type,
+      invoiceDate: orders.invoiceDate,
+    })
+    .from(orderItems)
+    .innerJoin(orders, eq(orderItems.orderId, orders.id))
+    .where(eq(orderItems.productId, id))
+    .orderBy(desc(orders.createdAt));
+
+  let totalUnitsSold = 0;
+  let totalUnitsPurchased = 0;
+  let totalSalesRevenuePaise = 0;
+
+  items.forEach((item) => {
+    if (item.orderType === "SO") {
+      totalUnitsSold += item.quantity;
+      totalSalesRevenuePaise += item.lineTotalPaise;
+    } else if (item.orderType === "PO") {
+      totalUnitsPurchased += item.quantity;
+    }
+  });
+
+  const marginPercentage =
+    product.salesPrice > 0
+      ? Math.round(((product.salesPrice - product.costPrice) / product.salesPrice) * 100)
+      : 0;
+
+  return {
+    product,
+    stockOnHand,
+    transactions: items,
+    summary: {
+      totalUnitsSold,
+      totalUnitsPurchased,
+      totalSalesRevenuePaise,
+      marginPercentage,
+    },
+  };
 }

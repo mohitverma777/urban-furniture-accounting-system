@@ -6,7 +6,8 @@
 
 import { db } from "@/db";
 import { contacts, type Contact } from "@/db/schema/contacts";
-import { eq, and, like, or } from "drizzle-orm";
+import { orders, type Order } from "@/db/schema/orders";
+import { eq, and, like, or, desc } from "drizzle-orm";
 import {
   contactFormSchema,
   type ContactFormValues,
@@ -154,4 +155,45 @@ export async function unarchiveContact(id: string): Promise<Contact> {
     .returning();
 
   return restored;
+}
+
+export interface ContactDetails {
+  contact: Contact;
+  orders: Order[];
+  summary: {
+    totalOrders: number;
+    totalAmountPaise: number;
+    paidOrdersCount: number;
+    pendingOrdersCount: number;
+  };
+}
+
+/**
+ * Fetch full profile details and transaction history for a specific contact.
+ */
+export async function getContactDetails(id: string): Promise<ContactDetails | null> {
+  const contact = await getContactById(id);
+  if (!contact) return null;
+
+  const contactOrders = await db
+    .select()
+    .from(orders)
+    .where(eq(orders.contactId, id))
+    .orderBy(desc(orders.createdAt));
+
+  const totalOrders = contactOrders.length;
+  const totalAmountPaise = contactOrders.reduce((sum, o) => sum + (o.totalAmount || 0), 0);
+  const paidOrdersCount = contactOrders.filter((o) => o.status === "PAID").length;
+  const pendingOrdersCount = contactOrders.filter((o) => o.status !== "PAID").length;
+
+  return {
+    contact,
+    orders: contactOrders,
+    summary: {
+      totalOrders,
+      totalAmountPaise,
+      paidOrdersCount,
+      pendingOrdersCount,
+    },
+  };
 }

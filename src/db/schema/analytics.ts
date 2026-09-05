@@ -71,6 +71,16 @@ export const budgets = sqliteTable(
     /** Responsible person for budget management (Problem Statement requirement) */
     responsiblePerson: text("responsible_person"),
 
+    /** Status pipeline: DRAFT | CONFIRMED | REVISED | CANCELLED */
+    status: text("status", {
+      enum: ["DRAFT", "CONFIRMED", "REVISED", "CANCELLED"],
+    })
+      .notNull()
+      .default("DRAFT"),
+
+    /** Link to original budget if this budget is a revision */
+    revisionOfId: text("revision_of_id"),
+
     createdAt: integer("created_at", { mode: "timestamp" })
       .notNull()
       .$defaultFn(() => new Date()),

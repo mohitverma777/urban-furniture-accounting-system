@@ -1,22 +1,33 @@
 "use client";
 
 import React, { useState, useMemo } from "react";
-import { Search, Filter, Eye, FileText, CheckCircle2, AlertCircle, Calendar } from "lucide-react";
+import { Search, Filter, Eye, FileText, CheckCircle2, AlertCircle, Calendar, Plus } from "lucide-react";
+import type { Account } from "@/db/schema/accounts";
+import type { Contact } from "@/db/schema/contacts";
 import type { JournalEntryListItem, JournalSummaryItem } from "@/services/accounting/query";
 import { EmptyState } from "@/components/common/empty-state";
 import { JournalEntryDetailModal } from "./journal-entry-detail-modal";
+import { JournalEntryFormModal } from "./journal-entry-form-modal";
 
 export interface JournalEntriesTableProps {
   initialEntries: JournalEntryListItem[];
   journalsList: JournalSummaryItem[];
+  accountsList?: Account[];
+  contactsList?: Contact[];
 }
 
-export function JournalEntriesTable({ initialEntries, journalsList }: JournalEntriesTableProps) {
+export function JournalEntriesTable({
+  initialEntries,
+  journalsList,
+  accountsList = [],
+  contactsList = [],
+}: JournalEntriesTableProps) {
   const [search, setSearch] = useState("");
   const [selectedJournal, setSelectedJournal] = useState<string>("ALL");
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
   const [selectedEntryId, setSelectedEntryId] = useState<string | null>(null);
+  const [isCreateOpen, setIsCreateOpen] = useState(false);
 
   const filteredEntries = useMemo(() => {
     return initialEntries.filter((entry) => {
@@ -49,7 +60,7 @@ export function JournalEntriesTable({ initialEntries, journalsList }: JournalEnt
 
   return (
     <div className="space-y-6">
-      {/* Filter Bar */}
+      {/* Top Controls & Filter Bar */}
       <div className="bg-slate-900/60 p-4 rounded-2xl border border-slate-800 backdrop-blur-sm space-y-3 sm:space-y-0 sm:flex sm:items-center sm:justify-between sm:gap-4">
         {/* Reference / Search */}
         <div className="relative flex-1 min-w-[220px]">
@@ -63,7 +74,7 @@ export function JournalEntriesTable({ initialEntries, journalsList }: JournalEnt
           />
         </div>
 
-        {/* Filters */}
+        {/* Filters & Action */}
         <div className="flex flex-wrap items-center gap-3">
           {/* Journal Selector */}
           <div className="flex items-center gap-2">
@@ -71,7 +82,7 @@ export function JournalEntriesTable({ initialEntries, journalsList }: JournalEnt
             <select
               value={selectedJournal}
               onChange={(e) => setSelectedJournal(e.target.value)}
-              className="bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-sm text-slate-200 focus:outline-none focus:border-amber-500/50 transition-colors"
+              className="bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-sm text-slate-200 focus:outline-none focus:border-amber-500/50 transition-colors cursor-pointer"
             >
               <option value="ALL">All Journals</option>
               {journalsList.map((j) => (
@@ -101,6 +112,15 @@ export function JournalEntriesTable({ initialEntries, journalsList }: JournalEnt
               className="bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-sm text-slate-200 focus:outline-none focus:border-amber-500/50 transition-colors"
             />
           </div>
+
+          {/* + New Journal Entry Button (Excalidraw Design) */}
+          <button
+            onClick={() => setIsCreateOpen(true)}
+            className="inline-flex items-center gap-2 px-4 py-2 bg-amber-500 hover:bg-amber-400 text-slate-950 text-xs font-bold rounded-xl shadow-lg shadow-amber-950/40 transition-colors cursor-pointer"
+          >
+            <Plus className="w-4 h-4" />
+            <span>New Journal Entry</span>
+          </button>
         </div>
       </div>
 
@@ -119,8 +139,8 @@ export function JournalEntriesTable({ initialEntries, journalsList }: JournalEnt
                 <tr>
                   <th className="p-4">Date</th>
                   <th className="p-4">Journal</th>
-                  <th className="p-4">Reference</th>
-                  <th className="p-4">Description</th>
+                  <th className="p-4">Reference / Number</th>
+                  <th className="p-4">Description / Partner</th>
                   <th className="p-4 text-right">Total Debit</th>
                   <th className="p-4 text-right">Total Credit</th>
                   <th className="p-4 text-center">Status</th>
@@ -182,6 +202,15 @@ export function JournalEntriesTable({ initialEntries, journalsList }: JournalEnt
       <JournalEntryDetailModal
         entryId={selectedEntryId}
         onClose={() => setSelectedEntryId(null)}
+      />
+
+      {/* New Journal Entry Form Modal (Excalidraw Design) */}
+      <JournalEntryFormModal
+        isOpen={isCreateOpen}
+        onClose={() => setIsCreateOpen(false)}
+        journalsList={journalsList}
+        accountsList={accountsList}
+        contactsList={contactsList}
       />
     </div>
   );

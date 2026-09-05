@@ -35,7 +35,7 @@ function createSqliteDb() {
   // Next.js will tree-shake this for browser builds.
   // eslint-disable-next-line @typescript-eslint/no-require-imports
   const Database = require("better-sqlite3") as typeof import("better-sqlite3");
-  const dbPath = env.SQLITE_DB_PATH ?? "./local.db";
+  const dbPath = process.env.SQLITE_DB_PATH ?? env.SQLITE_DB_PATH ?? "./local.db";
   const sqlite = new Database(dbPath);
 
   // WAL mode: readers don't block writers and vice versa

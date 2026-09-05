@@ -3,7 +3,7 @@
 import React, { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { X, UserPlus, Edit3 } from "lucide-react";
+import { X, UserPlus, Edit3, Upload } from "lucide-react";
 import {
   contactFormSchema,
   type ContactFormValues,
@@ -32,6 +32,8 @@ export function ContactDialog({
     register,
     handleSubmit,
     reset,
+    watch,
+    setValue,
     formState: { errors, isSubmitting },
   } = useForm<ContactFormValues>({
     resolver: zodResolver(contactFormSchema),
@@ -44,8 +46,25 @@ export function ContactDialog({
       city: "",
       state: "",
       pincode: "",
+      profileImage: "",
     },
   });
+
+  const profileImageUrl = watch("profileImage");
+
+  const handleImageFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setValue("profileImage", reader.result as string, {
+          shouldValidate: true,
+          shouldDirty: true,
+        });
+      };
+      reader.readAsDataURL(file);
+    }
+  };
 
   useEffect(() => {
     if (initialData) {
@@ -58,6 +77,7 @@ export function ContactDialog({
         city: initialData.city ?? "",
         state: initialData.state ?? "",
         pincode: initialData.pincode ?? "",
+        profileImage: initialData.profileImage ?? "",
       });
     } else {
       reset({
@@ -69,6 +89,7 @@ export function ContactDialog({
         city: "",
         state: "",
         pincode: "",
+        profileImage: "",
       });
     }
   }, [initialData, reset, isOpen]);
@@ -183,6 +204,58 @@ export function ContactDialog({
                 <p className="text-xs text-rose-400 font-medium">{errors.mobile.message}</p>
               )}
             </div>
+          </div>
+
+          {/* Profile Image */}
+          <div className="space-y-1">
+            <label className="text-xs font-semibold text-slate-300">Profile Image / Avatar</label>
+            <div className="flex items-center gap-3">
+              {profileImageUrl ? (
+                <img
+                  src={profileImageUrl}
+                  alt="Profile Preview"
+                  className="w-12 h-12 rounded-full object-cover border border-amber-500/40 bg-slate-950 shrink-0"
+                  onError={(e) => {
+                    (e.currentTarget as HTMLElement).style.display = "none";
+                  }}
+                />
+              ) : (
+                <div className="w-12 h-12 rounded-full bg-slate-800 border border-slate-700 flex items-center justify-center text-[10px] font-semibold text-slate-400 shrink-0">
+                  No Img
+                </div>
+              )}
+              <div className="flex-1 space-y-1.5">
+                <div className="flex items-center gap-2">
+                  <label className="cursor-pointer inline-flex items-center gap-1.5 px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-medium rounded-xl border border-slate-700 transition-colors">
+                    <Upload className="w-3.5 h-3.5 text-amber-400" />
+                    <span>Upload Image File</span>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      className="hidden"
+                      onChange={handleImageFileChange}
+                    />
+                  </label>
+                  {profileImageUrl && (
+                    <button
+                      type="button"
+                      onClick={() => setValue("profileImage", "")}
+                      className="px-2 py-1 text-[11px] font-medium text-rose-400 hover:text-rose-300 transition-colors"
+                    >
+                      Remove
+                    </button>
+                  )}
+                </div>
+                <input
+                  {...register("profileImage")}
+                  placeholder="Or paste Image URL (https://...)"
+                  className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-1.5 text-xs text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-1 focus:ring-amber-400"
+                />
+              </div>
+            </div>
+            {errors.profileImage && (
+              <p className="text-xs text-rose-400 font-medium">{errors.profileImage.message}</p>
+            )}
           </div>
 
           {/* Address */}

@@ -14,6 +14,8 @@ export const productFormSchema = z.object({
   salesPrice: z.number().min(0, "Sales price cannot be negative"),
   costPrice: z.number().min(0, "Cost price cannot be negative"),
   category: z.string().trim().optional(),
+  imageUrl: z.string().trim().optional(),
+  openingStock: z.number().min(0, "Opening stock cannot be negative").optional(),
 });
 
 export type ProductFormValues = z.infer<typeof productFormSchema>;

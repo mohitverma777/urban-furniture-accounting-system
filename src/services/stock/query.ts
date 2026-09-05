@@ -74,34 +74,39 @@ export async function getProductStockSummaries(
       continue;
     }
 
-    // Query movement sums per movement type
+    // Query movements per product with referenceId and quantity
     const movements = await db
       .select({
         type: stockMovements.type,
-        totalQty: sql<number>`COALESCE(SUM(${stockMovements.quantity}), 0)`,
+        referenceId: stockMovements.referenceId,
+        quantity: stockMovements.quantity,
       })
       .from(stockMovements)
-      .where(eq(stockMovements.productId, prod.id))
-      .groupBy(stockMovements.type);
+      .where(eq(stockMovements.productId, prod.id));
 
+    let openingQty = 0;
     let purchasedQty = 0;
     let soldQty = 0;
     let adjustedQty = 0;
 
     for (const mov of movements) {
-      const val = Number(mov.totalQty);
+      const val = Number(mov.quantity);
       if (mov.type === "PURCHASE") {
         purchasedQty += val;
       } else if (mov.type === "SALE") {
         // Sales are recorded as negative quantities; convert to positive display count
         soldQty += Math.abs(val);
       } else if (mov.type === "ADJUSTMENT") {
-        adjustedQty += val;
+        if (mov.referenceId && mov.referenceId.toUpperCase().includes("OPENING")) {
+          openingQty += val;
+        } else {
+          adjustedQty += val;
+        }
       }
     }
 
-    // Current stock on hand = PURCHASE (+qty) - SALE (-qty) + ADJUSTMENT (+/- qty)
-    const currentQty = purchasedQty - soldQty + adjustedQty;
+    // Current stock on hand = OPENING + PURCHASE (+qty) - SALE (-qty) + ADJUSTMENT (+/- qty)
+    const currentQty = openingQty + purchasedQty - soldQty + adjustedQty;
 
     result.push({
       id: prod.id,
@@ -109,7 +114,7 @@ export async function getProductStockSummaries(
       category: prod.category,
       type: prod.type,
       isArchived: prod.isArchived,
-      openingQty: 0, // baseline opening quantity
+      openingQty,
       purchasedQty,
       soldQty,
       adjustedQty,

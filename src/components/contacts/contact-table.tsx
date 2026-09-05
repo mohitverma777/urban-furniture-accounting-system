@@ -10,9 +10,10 @@ import {
   createColumnHelper,
   type SortingState,
 } from "@tanstack/react-table";
-import { Search, Filter, Edit, Archive, RotateCcw, UserPlus } from "lucide-react";
+import { Search, Filter, Edit, Archive, RotateCcw, UserPlus, Eye } from "lucide-react";
 import type { Contact, ContactType } from "@/db/schema/contacts";
 import { ContactDialog } from "./contact-dialog";
+import { ContactDetailsDialog } from "./contact-details-dialog";
 import { ConfirmDialog } from "@/components/common/confirm-dialog";
 import { EmptyState } from "@/components/common/empty-state";
 import { useToast } from "@/components/ui/toast";
@@ -37,6 +38,9 @@ export function ContactTable({ initialContacts }: ContactTableProps) {
   // Dialog State
   const [dialogOpen, setDialogOpen] = useState(false);
   const [selectedContact, setSelectedContact] = useState<Contact | null>(null);
+
+  // View Details State
+  const [viewingContactId, setViewingContactId] = useState<string | null>(null);
 
   // Archive Confirm State
   const [archiveTarget, setArchiveTarget] = useState<Contact | null>(null);
@@ -113,16 +117,49 @@ export function ContactTable({ initialContacts }: ContactTableProps) {
     () => [
       columnHelper.accessor("name", {
         header: "Name",
-        cell: (info) => (
-          <div className="flex flex-col">
-            <span className="font-bold text-white">{info.getValue()}</span>
-            <span className="text-xs text-slate-400">
-              {info.row.original.address
-                ? `${info.row.original.address}, ${info.row.original.city ?? ""}`
-                : info.row.original.city ?? "No address"}
-            </span>
-          </div>
-        ),
+        cell: (info) => {
+          const contact = info.row.original;
+          const initials = contact.name
+            .split(" ")
+            .map((part) => part[0])
+            .filter(Boolean)
+            .slice(0, 2)
+            .join("")
+            .toUpperCase();
+
+          return (
+            <button
+              onClick={() => setViewingContactId(contact.id)}
+              className="flex items-center gap-3 text-left group cursor-pointer focus:outline-none"
+              title="Click to view full details"
+            >
+              {contact.profileImage ? (
+                <img
+                  src={contact.profileImage}
+                  alt={contact.name}
+                  className="w-9 h-9 rounded-full object-cover border border-slate-700 bg-slate-950 shrink-0 group-hover:border-amber-400 transition-colors"
+                  onError={(e) => {
+                    (e.currentTarget as HTMLElement).style.display = "none";
+                  }}
+                />
+              ) : (
+                <div className="w-9 h-9 rounded-full bg-slate-800 border border-slate-700 flex items-center justify-center text-xs font-bold text-amber-400 shrink-0 group-hover:border-amber-400 transition-colors">
+                  {initials || "C"}
+                </div>
+              )}
+              <div className="flex flex-col">
+                <span className="font-bold text-white group-hover:text-amber-400 transition-colors">
+                  {info.getValue()}
+                </span>
+                <span className="text-xs text-slate-400">
+                  {contact.address
+                    ? `${contact.address}, ${contact.city ?? ""}`
+                    : contact.city ?? "No address"}
+                </span>
+              </div>
+            </button>
+          );
+        },
       }),
       columnHelper.accessor("type", {
         header: "Type",
@@ -169,7 +206,14 @@ export function ContactTable({ initialContacts }: ContactTableProps) {
         cell: (info) => {
           const contact = info.row.original;
           return (
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-1.5">
+              <button
+                onClick={() => setViewingContactId(contact.id)}
+                className="p-1.5 rounded-lg text-slate-400 hover:text-blue-400 hover:bg-slate-800 transition-colors"
+                title="View Full Contact Details"
+              >
+                <Eye className="w-4 h-4" />
+              </button>
               <button
                 onClick={() => handleEdit(contact)}
                 className="p-1.5 rounded-lg text-slate-400 hover:text-amber-400 hover:bg-slate-800 transition-colors"
@@ -354,6 +398,14 @@ export function ContactTable({ initialContacts }: ContactTableProps) {
         confirmText={archiveTarget?.isArchived ? "Restore Contact" : "Archive Contact"}
         variant={archiveTarget?.isArchived ? "info" : "danger"}
         isLoading={isArchiving}
+      />
+
+      {/* Full Contact Profile & Transaction Details Modal */}
+      <ContactDetailsDialog
+        contactId={viewingContactId}
+        isOpen={Boolean(viewingContactId)}
+        onClose={() => setViewingContactId(null)}
+        onEdit={(contact) => handleEdit(contact)}
       />
     </div>
   );

@@ -27,6 +27,8 @@ export type { AnalyticAccountType };
 export type BudgetStatus = "On Track" | "Near Limit" | "Over Budget";
 
 
+export type WorkflowStatus = "DRAFT" | "CONFIRMED" | "REVISED" | "CANCELLED";
+
 export interface CreateAnalyticAccountInput {
   name: string;
   type: AnalyticAccountType;
@@ -55,6 +57,11 @@ export interface BudgetReportItem {
   endDate: Date;
   responsiblePerson?: string | null;
   status: BudgetStatus;
+  workflowStatus: WorkflowStatus;
+  revisionOfId?: string | null;
+  revisionOfName?: string | null;
+  revisedWithId?: string | null;
+  revisedWithName?: string | null;
 }
 
 // ---------------------------------------------------------------------------
@@ -132,6 +139,7 @@ export async function createBudget(input: CreateBudgetInput): Promise<Budget> {
       startDate: input.startDate,
       endDate: input.endDate,
       responsiblePerson: input.responsiblePerson ?? null,
+      status: "DRAFT",
     })
     .returning();
 
@@ -148,12 +156,62 @@ export async function getBudgetsList() {
       startDate: budgets.startDate,
       endDate: budgets.endDate,
       responsiblePerson: budgets.responsiblePerson,
+      status: budgets.status,
+      revisionOfId: budgets.revisionOfId,
       analyticName: analyticAccounts.name,
       analyticType: analyticAccounts.type,
     })
     .from(budgets)
     .innerJoin(analyticAccounts, eq(budgets.analyticAccountId, analyticAccounts.id))
     .orderBy(desc(budgets.createdAt));
+}
+
+export async function updateBudgetWorkflowStatus(
+  id: string,
+  newStatus: WorkflowStatus
+): Promise<void> {
+  await db
+    .update(budgets)
+    .set({ status: newStatus })
+    .where(eq(budgets.id, id));
+}
+
+export async function reviseBudget(
+  originalId: string,
+  input: {
+    newName?: string;
+    plannedAmount: number;
+    responsiblePerson?: string;
+  }
+): Promise<Budget> {
+  const [orig] = await db.select().from(budgets).where(eq(budgets.id, originalId));
+  if (!orig) {
+    throw new Error("Original budget not found.");
+  }
+
+  // Mark original as REVISED
+  await db
+    .update(budgets)
+    .set({ status: "REVISED" })
+    .where(eq(budgets.id, originalId));
+
+  // Create new revised budget
+  const revisedName = input.newName || `${orig.name} (Revised)`;
+  const [created] = await db
+    .insert(budgets)
+    .values({
+      name: revisedName,
+      analyticAccountId: orig.analyticAccountId,
+      plannedAmount: input.plannedAmount,
+      startDate: orig.startDate,
+      endDate: orig.endDate,
+      responsiblePerson: input.responsiblePerson ?? orig.responsiblePerson,
+      status: "CONFIRMED",
+      revisionOfId: originalId,
+    })
+    .returning();
+
+  return created;
 }
 
 // ---------------------------------------------------------------------------
@@ -163,6 +221,9 @@ export async function getBudgetsList() {
 export async function getBudgetReportItems(): Promise<BudgetReportItem[]> {
   const allBudgets = await getBudgetsList();
   const reportItems: BudgetReportItem[] = [];
+
+  // Build lookup maps for revision names
+  const budgetMap = new Map(allBudgets.map((b) => [b.id, b]));
 
   for (const b of allBudgets) {
     const endOfPeriod = new Date(b.endDate);
@@ -193,9 +254,6 @@ export async function getBudgetReportItems(): Promise<BudgetReportItem[]> {
       }
     }
 
-    // Variance:
-    // For EXPENSE: Planned - Actual (Positive = remaining budget under spent)
-    // For INCOME: Actual - Planned (Positive = target exceeded)
     const varianceAmount =
       b.analyticType === "EXPENSE"
         ? b.plannedAmount - actualAmount
@@ -213,6 +271,9 @@ export async function getBudgetReportItems(): Promise<BudgetReportItem[]> {
       status = "Near Limit";
     }
 
+    const revisionOfBudget = b.revisionOfId ? budgetMap.get(b.revisionOfId) : null;
+    const revisedWithBudget = allBudgets.find((candidate) => candidate.revisionOfId === b.id);
+
     reportItems.push({
       id: b.id,
       name: b.name,
@@ -227,8 +288,14 @@ export async function getBudgetReportItems(): Promise<BudgetReportItem[]> {
       endDate: new Date(b.endDate),
       responsiblePerson: b.responsiblePerson,
       status,
+      workflowStatus: (b.status as WorkflowStatus) || "DRAFT",
+      revisionOfId: b.revisionOfId ?? null,
+      revisionOfName: revisionOfBudget ? revisionOfBudget.name : null,
+      revisedWithId: revisedWithBudget ? revisedWithBudget.id : null,
+      revisedWithName: revisedWithBudget ? revisedWithBudget.name : null,
     });
   }
 
   return reportItems;
 }
+

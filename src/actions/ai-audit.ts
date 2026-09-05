@@ -20,10 +20,10 @@ export interface AiAuditResponse {
  */
 export async function runAiLedgerAuditAction(): Promise<AiAuditResponse> {
   try {
-    // 1. Run deterministic anomaly detectors with timeout to avoid long DB queries
+    // 1. Run deterministic anomaly detectors with generous timeout
     let auditReport: AuditReport;
     try {
-      const detectorTimeoutMs = 3000;
+      const detectorTimeoutMs = 15000;
       const auditPromise = runFullLedgerAudit();
       const timeoutPromise = new Promise<never>((_, reject) =>
         setTimeout(() => reject(new Error('Audit detectors timeout')), detectorTimeoutMs)
@@ -96,7 +96,8 @@ ${JSON.stringify(structuredPayload, null, 2)}
 
 Please explain these audit findings, why they matter, and the recommended review actions.`;
 
-      const timeoutMs = 2000;
+      // 30s timeout in dev/prod for local LLM or cloud API; 1.5s in test environment for fast Vitest execution
+      const timeoutMs = process.env.NODE_ENV === "test" || process.env.VITEST ? 1500 : 30000;
       const aiPromise = generateText({
         model: getAiModel("gemma3:4b"),
         system: systemInstruction,
@@ -113,8 +114,16 @@ Please explain these audit findings, why they matter, and the recommended review
         aiErr
       );
       isAiAvailable = false;
-      aiExplanation =
-        "AI explanation currently unavailable (local model offline or timed out). The deterministic ledger audit findings above have been extracted directly from the database and are ready for manual review.";
+      aiExplanation = `### 📋 Automated Ledger Audit Report
+**${auditReport.totalFindingsCount} ${
+        auditReport.totalFindingsCount === 1 ? "finding" : "findings"
+      } detected** (${auditReport.criticalCount} Critical, ${auditReport.highCount} High severity).
+
+${auditReport.findings
+  .map((f) => `* **[${f.severity.toUpperCase()}] ${f.title}**: ${f.description}`)
+  .join("\n\n")}
+
+> *Note: Analysis generated via deterministic audit rules while local LLM engine is offline.*`;
     }
 
     return {

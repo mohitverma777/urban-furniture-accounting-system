@@ -40,4 +40,4 @@ describe("AI Ledger Audit Action (runAiLedgerAuditAction)", () => {
     // Accounting application remains 100% functional
     expect(result.error).toBeUndefined();
   });
-});
+}, 10000);

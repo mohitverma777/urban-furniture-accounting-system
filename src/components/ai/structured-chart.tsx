@@ -21,6 +21,7 @@ import {
   YAxis,
   Tooltip,
   CartesianGrid,
+  Legend,
 } from "recharts";
 import { BarChart3, PieChart as PieIcon } from "lucide-react";
 
@@ -148,10 +149,12 @@ export function StructuredChartRenderer({ chart }: { chart: StructuredChartPaylo
                 dataKey="value"
                 nameKey="name"
                 cx="50%"
-                cy="50%"
-                outerRadius={70}
-                innerRadius={35}
-                paddingAngle={3}
+                cy="45%"
+                outerRadius={75}
+                innerRadius={40}
+                paddingAngle={4}
+                stroke="#0f172a"
+                strokeWidth={2}
               >
                 {chart.data.map((_, index) => (
                   <Cell key={`cell-pie-${index}`} fill={COLORS[index % COLORS.length]} />
@@ -161,11 +164,16 @@ export function StructuredChartRenderer({ chart }: { chart: StructuredChartPaylo
                 contentStyle={{
                   backgroundColor: "#0f172a",
                   borderColor: "#334155",
-                  borderRadius: "10px",
+                  borderRadius: "12px",
                   color: "#f8fafc",
                   fontSize: "12px",
+                  fontWeight: "600",
                 }}
                 formatter={(val) => [formatCurrency(Number(val) || 0), "Value"]}
+              />
+              <Legend
+                wrapperStyle={{ fontSize: "11px", paddingTop: "8px" }}
+                formatter={(value) => <span className="text-slate-300 font-medium">{value}</span>}
               />
             </PieChart>
           )}

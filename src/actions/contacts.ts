@@ -6,6 +6,7 @@ import {
   updateContact,
   archiveContact,
   unarchiveContact,
+  getContactDetails,
   type ContactFormValues,
 } from "@/services/contacts";
 
@@ -60,6 +61,21 @@ export async function unarchiveContactAction(id: string) {
     return {
       success: false,
       error: error instanceof Error ? error.message : "Failed to restore contact",
+    };
+  }
+}
+
+export async function getContactDetailsAction(id: string) {
+  try {
+    const details = await getContactDetails(id);
+    if (!details) {
+      return { success: false, error: "Contact not found" };
+    }
+    return { success: true, details };
+  } catch (error) {
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : "Failed to fetch contact details",
     };
   }
 }

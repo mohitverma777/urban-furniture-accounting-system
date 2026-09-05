@@ -10,10 +10,11 @@ import {
   createColumnHelper,
   type SortingState,
 } from "@tanstack/react-table";
-import { Search, Filter, Edit, Archive, RotateCcw, PackagePlus } from "lucide-react";
+import { Search, Filter, Edit, Archive, RotateCcw, PackagePlus, Eye, Package } from "lucide-react";
 import type { Product, ProductType } from "@/db/schema/products";
 import { canCreateStockMovement } from "@/services/products/schema";
 import { ProductDialog } from "./product-dialog";
+import { ProductDetailsDialog } from "./product-details-dialog";
 import { ConfirmDialog } from "@/components/common/confirm-dialog";
 import { EmptyState } from "@/components/common/empty-state";
 import { useToast } from "@/components/ui/toast";
@@ -39,6 +40,9 @@ export function ProductTable({ initialProducts }: ProductTableProps) {
   // Dialog State
   const [dialogOpen, setDialogOpen] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+
+  // View Details State
+  const [viewingProductId, setViewingProductId] = useState<string | null>(null);
 
   // Archive Confirm State
   const [archiveTarget, setArchiveTarget] = useState<Product | null>(null);
@@ -125,14 +129,39 @@ export function ProductTable({ initialProducts }: ProductTableProps) {
     () => [
       columnHelper.accessor("name", {
         header: "Product / Service Name",
-        cell: (info) => (
-          <div className="flex flex-col">
-            <span className="font-bold text-white">{info.getValue()}</span>
-            <span className="text-xs text-slate-400">
-              Category: {info.row.original.category || "Uncategorized"}
-            </span>
-          </div>
-        ),
+        cell: (info) => {
+          const product = info.row.original;
+          return (
+            <button
+              onClick={() => setViewingProductId(product.id)}
+              className="flex items-center gap-3 text-left group cursor-pointer focus:outline-none"
+              title="Click to view product details"
+            >
+              {product.imageUrl ? (
+                <img
+                  src={product.imageUrl}
+                  alt={product.name}
+                  className="w-10 h-10 rounded-xl object-cover border border-slate-700 bg-slate-950 shrink-0 group-hover:border-amber-400 transition-colors"
+                  onError={(e) => {
+                    (e.currentTarget as HTMLElement).style.display = "none";
+                  }}
+                />
+              ) : (
+                <div className="w-10 h-10 rounded-xl bg-slate-800 border border-slate-700 flex items-center justify-center text-amber-400 shrink-0 group-hover:border-amber-400 transition-colors">
+                  <Package className="w-5 h-5" />
+                </div>
+              )}
+              <div className="flex flex-col">
+                <span className="font-bold text-white group-hover:text-amber-400 transition-colors">
+                  {info.getValue()}
+                </span>
+                <span className="text-xs text-slate-400">
+                  Category: {product.category || "Uncategorized"}
+                </span>
+              </div>
+            </button>
+          );
+        },
       }),
       columnHelper.accessor("type", {
         header: "Type",
@@ -188,7 +217,14 @@ export function ProductTable({ initialProducts }: ProductTableProps) {
         cell: (info) => {
           const product = info.row.original;
           return (
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-1.5">
+              <button
+                onClick={() => setViewingProductId(product.id)}
+                className="p-1.5 rounded-lg text-slate-400 hover:text-blue-400 hover:bg-slate-800 transition-colors"
+                title="View Product Details"
+              >
+                <Eye className="w-4 h-4" />
+              </button>
               <button
                 onClick={() => handleEdit(product)}
                 className="p-1.5 rounded-lg text-slate-400 hover:text-amber-400 hover:bg-slate-800 transition-colors"
@@ -389,6 +425,14 @@ export function ProductTable({ initialProducts }: ProductTableProps) {
         confirmText={archiveTarget?.isArchived ? "Restore Product" : "Archive Product"}
         variant={archiveTarget?.isArchived ? "info" : "danger"}
         isLoading={isArchiving}
+      />
+
+      {/* Product Details & Inventory History Modal */}
+      <ProductDetailsDialog
+        productId={viewingProductId}
+        isOpen={Boolean(viewingProductId)}
+        onClose={() => setViewingProductId(null)}
+        onEdit={(product) => handleEdit(product)}
       />
     </div>
   );
