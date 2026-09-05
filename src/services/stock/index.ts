@@ -10,6 +10,8 @@ import { products } from "@/db/schema/products";
 import { canCreateStockMovement } from "@/services/products";
 import { eq, sum } from "drizzle-orm";
 
+export * from "./query";
+
 export interface RecordStockMovementInput {
   productId: string;
   type: StockMovementType;
