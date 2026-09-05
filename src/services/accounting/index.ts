@@ -28,6 +28,8 @@ import {
   journalItems,
   orders,
   payments,
+  journals,
+  accounts,
   type NewJournalItem,
 } from "@/db/schema";
 
@@ -63,9 +65,9 @@ export interface JournalEntryResult {
 /** Input for posting a customer invoice */
 export interface PostCustomerInvoiceInput {
   orderId: string;
-  salesJournalId: string;
-  debtorsAccountId: string;
-  salesIncomeAccountId: string;
+  salesJournalId?: string;
+  debtorsAccountId?: string;
+  salesIncomeAccountId?: string;
   taxPayableAccountId?: string;
   date?: Date;
   reference?: string;
@@ -74,9 +76,9 @@ export interface PostCustomerInvoiceInput {
 /** Input for posting a vendor bill */
 export interface PostVendorBillInput {
   orderId: string;
-  purchaseJournalId: string;
-  purchaseExpenseAccountId: string;
-  creditorsAccountId: string;
+  purchaseJournalId?: string;
+  purchaseExpenseAccountId?: string;
+  creditorsAccountId?: string;
   analyticAccountId?: string;
   date?: Date;
   reference?: string;
@@ -87,13 +89,14 @@ export interface RecordCustomerPaymentInput {
   orderId: string;
   amount: number;
   paymentMethod: "CASH" | "BANK";
-  bankJournalId: string;
-  cashJournalId: string;
-  bankAccountId: string;
-  cashAccountId: string;
-  debtorsAccountId: string;
+  bankJournalId?: string;
+  cashJournalId?: string;
+  bankAccountId?: string;
+  cashAccountId?: string;
+  debtorsAccountId?: string;
   paymentDate?: Date;
   paymentReference?: string;
+  reference?: string;
 }
 
 /** Input for recording a vendor payment */
@@ -101,13 +104,14 @@ export interface RecordVendorPaymentInput {
   orderId: string;
   amount: number;
   paymentMethod: "CASH" | "BANK";
-  bankJournalId: string;
-  cashJournalId: string;
-  bankAccountId: string;
-  cashAccountId: string;
-  creditorsAccountId: string;
+  bankJournalId?: string;
+  cashJournalId?: string;
+  bankAccountId?: string;
+  cashAccountId?: string;
+  creditorsAccountId?: string;
   paymentDate?: Date;
   paymentReference?: string;
+  reference?: string;
 }
 
 /** Payment result returned to caller */
@@ -305,6 +309,36 @@ export async function createJournalEntry(
  * @throws {OrderNotFoundError} if orderId doesn't exist.
  * @throws {InvalidOrderTypeError} if order is not a SO.
  */
+/** Helper to resolve default journal ID by type if not provided */
+export async function getJournalIdByType(
+  type: "SALES" | "PURCHASE" | "BANK" | "CASH",
+  database: DB = db,
+): Promise<string> {
+  const [j] = await database
+    .select()
+    .from(journals)
+    .where(eq(journals.type, type));
+  if (!j) {
+    throw new Error(`No default journal of type '${type}' found in database.`);
+  }
+  return j.id;
+}
+
+/** Helper to resolve default account ID by code if not provided */
+export async function getAccountIdByCode(
+  code: string,
+  database: DB = db,
+): Promise<string> {
+  const [acc] = await database
+    .select()
+    .from(accounts)
+    .where(eq(accounts.code, code));
+  if (!acc) {
+    throw new Error(`No default account with code '${code}' found in database.`);
+  }
+  return acc.id;
+}
+
 export async function postCustomerInvoice(
   input: PostCustomerInvoiceInput,
   database: DB = db,
@@ -324,6 +358,17 @@ export async function postCustomerInvoice(
     throw new InvalidOrderTypeError(input.orderId, "SO", order.type);
   }
 
+  // Auto-resolve missing account and journal IDs
+  const salesJournalId =
+    input.salesJournalId ?? (await getJournalIdByType("SALES", database));
+  const debtorsAccountId =
+    input.debtorsAccountId ?? (await getAccountIdByCode("1100", database));
+  const salesIncomeAccountId =
+    input.salesIncomeAccountId ?? (await getAccountIdByCode("4000", database));
+  const taxPayableAccountId =
+    input.taxPayableAccountId ??
+    (order.taxAmount > 0 ? await getAccountIdByCode("2200", database) : undefined);
+
   // Idempotency: if already billed or paid, check for existing journal entry
   if (order.status === "BILLED" || order.status === "PAID") {
     const existingEntry = await database
@@ -331,7 +376,7 @@ export async function postCustomerInvoice(
       .from(journalEntries)
       .where(
         and(
-          eq(journalEntries.journalId, input.salesJournalId),
+          eq(journalEntries.journalId, salesJournalId),
           eq(
             journalEntries.reference,
             input.reference ?? `INV-${order.orderNumber}`,
@@ -366,21 +411,21 @@ export async function postCustomerInvoice(
   // Build journal lines
   const lines: JournalLineInput[] = [
     {
-      accountId: input.debtorsAccountId,
+      accountId: debtorsAccountId,
       debit: order.totalAmount,
       credit: 0,
     },
     {
-      accountId: input.salesIncomeAccountId,
+      accountId: salesIncomeAccountId,
       debit: 0,
       credit: order.subtotal,
     },
   ];
 
   // Add tax line only when there is tax
-  if (order.taxAmount > 0 && input.taxPayableAccountId) {
+  if (order.taxAmount > 0 && taxPayableAccountId) {
     lines.push({
-      accountId: input.taxPayableAccountId,
+      accountId: taxPayableAccountId,
       debit: 0,
       credit: order.taxAmount,
     });
@@ -391,7 +436,7 @@ export async function postCustomerInvoice(
 
   const result = await createJournalEntry(
     {
-      journalId: input.salesJournalId,
+      journalId: salesJournalId,
       date,
       reference: ref,
       description: `Customer Invoice for ${order.orderNumber}`,
@@ -447,6 +492,17 @@ export async function postVendorBill(
     throw new InvalidOrderTypeError(input.orderId, "PO", order.type);
   }
 
+  // Auto-resolve missing account and journal IDs
+  const purchaseJournalId =
+    input.purchaseJournalId ?? (await getJournalIdByType("PURCHASE", database));
+  const purchaseExpenseAccountId =
+    input.purchaseExpenseAccountId ?? (await getAccountIdByCode("5000", database));
+  const creditorsAccountId =
+    input.creditorsAccountId ?? (await getAccountIdByCode("2000", database));
+  const taxPayableAccountId =
+    input.taxPayableAccountId ??
+    (order.taxAmount > 0 ? await getAccountIdByCode("2200", database) : undefined);
+
   // Idempotency check
   if (order.status === "BILLED" || order.status === "PAID") {
     const existingEntry = await database
@@ -454,7 +510,7 @@ export async function postVendorBill(
       .from(journalEntries)
       .where(
         and(
-          eq(journalEntries.journalId, input.purchaseJournalId),
+          eq(journalEntries.journalId, purchaseJournalId),
           eq(
             journalEntries.reference,
             input.reference ?? `BILL-${order.orderNumber}`,
@@ -488,7 +544,7 @@ export async function postVendorBill(
   // Build journal lines
   const lines: JournalLineInput[] = [
     {
-      accountId: input.purchaseExpenseAccountId,
+      accountId: purchaseExpenseAccountId,
       debit: order.subtotal,
       credit: 0,
       analyticAccountId: input.analyticAccountId ?? null,
@@ -496,18 +552,18 @@ export async function postVendorBill(
   ];
 
   // Add tax line if there's tax and account is provided
-  if (order.taxAmount > 0 && input.taxPayableAccountId) {
+  if (order.taxAmount > 0 && taxPayableAccountId) {
     lines.push({
-      accountId: input.taxPayableAccountId,
+      accountId: taxPayableAccountId,
       debit: order.taxAmount,
       credit: 0,
     });
   }
 
   lines.push({
-    accountId: input.creditorsAccountId,
+    accountId: creditorsAccountId,
     debit: 0,
-    credit: order.taxAmount > 0 && input.taxPayableAccountId
+    credit: order.taxAmount > 0 && taxPayableAccountId
       ? order.totalAmount
       : order.subtotal,
   });
@@ -517,7 +573,7 @@ export async function postVendorBill(
 
   const result = await createJournalEntry(
     {
-      journalId: input.purchaseJournalId,
+      journalId: purchaseJournalId,
       date,
       reference: ref,
       description: `Vendor Bill for ${order.orderNumber}`,
@@ -650,10 +706,16 @@ export async function recordCustomerPayment(
 
   // Determine which journal and account to use
   const isCash = input.paymentMethod === "CASH";
-  const journalId = isCash ? input.cashJournalId : input.bankJournalId;
+  const journalId = isCash
+    ? (input.cashJournalId ?? (await getJournalIdByType("CASH", database)))
+    : (input.bankJournalId ?? (await getJournalIdByType("BANK", database)));
+
   const cashOrBankAccountId = isCash
-    ? input.cashAccountId
-    : input.bankAccountId;
+    ? (input.cashAccountId ?? (await getAccountIdByCode("1000", database)))
+    : (input.bankAccountId ?? (await getAccountIdByCode("1010", database)));
+
+  const debtorsAccountId =
+    input.debtorsAccountId ?? (await getAccountIdByCode("1100", database));
 
   const ref =
     input.paymentReference ?? `PAY-${order.orderNumber}-${Date.now()}`;
@@ -673,7 +735,7 @@ export async function recordCustomerPayment(
           credit: 0,
         },
         {
-          accountId: input.debtorsAccountId,
+          accountId: debtorsAccountId,
           debit: 0,
           credit: input.amount,
         },
@@ -753,13 +815,19 @@ export async function recordVendorPayment(
 
   // Determine which journal and account to use
   const isCash = input.paymentMethod === "CASH";
-  const journalId = isCash ? input.cashJournalId : input.bankJournalId;
+  const journalId = isCash
+    ? (input.cashJournalId ?? (await getJournalIdByType("CASH", database)))
+    : (input.bankJournalId ?? (await getJournalIdByType("BANK", database)));
+
   const cashOrBankAccountId = isCash
-    ? input.cashAccountId
-    : input.bankAccountId;
+    ? (input.cashAccountId ?? (await getAccountIdByCode("1000", database)))
+    : (input.bankAccountId ?? (await getAccountIdByCode("1010", database)));
+
+  const creditorsAccountId =
+    input.creditorsAccountId ?? (await getAccountIdByCode("2000", database));
 
   const ref =
-    input.paymentReference ?? `PAY-${order.orderNumber}-${Date.now()}`;
+    input.paymentReference ?? input.reference ?? `PAY-${order.orderNumber}-${Date.now()}`;
   const date = input.paymentDate ?? new Date();
 
   // Create the journal entry
@@ -771,7 +839,7 @@ export async function recordVendorPayment(
       description: `Vendor payment for ${order.orderNumber}`,
       lines: [
         {
-          accountId: input.creditorsAccountId,
+          accountId: creditorsAccountId,
           debit: input.amount,
           credit: 0,
         },
