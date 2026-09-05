@@ -18,7 +18,6 @@
  *   - All monetary values are INTEGER PAISE (1 INR = 100 paise)
  *   - Operations use DB transactions for atomicity
  *   - Payments reject zero/negative amounts, duplicates, and overpayments
- *   - Posting operations are idempotent where noted
  */
 
 import { eq, sql, and } from "drizzle-orm";
@@ -938,3 +937,5 @@ export function calculateOrderTotals(
     totalAmount: subtotal + taxAmount,
   };
 }
+
+export * from "./query";
