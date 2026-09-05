@@ -1,21 +1,42 @@
 /**
  * src/db/schema/index.ts
  *
- * Drizzle ORM schema barrel placeholder.
+ * Single entry point for all Drizzle ORM schema tables and relations.
  *
- * Individual schema modules will be added here:
- *  - accounting.ts   (accounts, journals, journal_entries, journal_lines)
- *  - partners.ts     (contacts)
- *  - catalog.ts      (products, categories, units of measure)
- *  - sales.ts        (sales_orders, sales_order_lines, invoices, invoice_lines)
- *  - purchases.ts    (purchase_orders, po_lines, bills, bill_lines)
- *  - payments.ts     (payments, payment_allocations)
- *  - stock.ts        (stock_moves, stock_quants, warehouses, locations)
- *  - analytics.ts    (analytic_accounts, budgets, budget_lines)
+ * Import order follows the dependency graph (depended-on tables first):
+ *   contacts, products
+ *   → accounts (journals refs accounts)
+ *   → analytics (budgets refs analyticAccounts)
+ *   → journal-entries (refs accounts, analytics)
+ *   → orders (refs contacts, products)
+ *   → payments (refs orders, journal-entries)
+ *   → stock (refs products)
+ *   → relations (refs all of the above)
  *
- * All monetary columns are INTEGER (paise) — never REAL/FLOAT/DECIMAL.
+ * Used by:
+ *   - drizzle.config.ts  (schema discovery for migration generation)
+ *   - src/db/index.ts    (passed to drizzle() client constructor)
  */
 
-// No schema yet — Drizzle ORM will be installed and schema defined
-// in a subsequent task.
-export {};
+// Standalone domain tables
+export * from "./contacts";
+export * from "./products";
+
+// Accounting configuration
+export * from "./accounts";
+
+// Analytic / budget
+export * from "./analytics";
+
+// Double-entry journal engine
+export * from "./journal-entries";
+
+// Transactional documents
+export * from "./orders";
+export * from "./payments";
+
+// Inventory
+export * from "./stock";
+
+// Drizzle relational query definitions (must come last — references all tables)
+export * from "./relations";
