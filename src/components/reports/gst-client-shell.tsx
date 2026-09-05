@@ -21,6 +21,7 @@ import {
   ArrowDownRight,
   FileSpreadsheet,
 } from "lucide-react";
+import { AiExplainButton } from "@/components/ai/ai-explainer-dialog";
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -268,11 +269,25 @@ function MonthAccordion({ row }: { row: GSTMonthlyRow }) {
                   : "No GST Liability"}
               </span>
             </div>
-            <span className={`text-lg font-bold font-mono ${
-              row.netGSTLiability > 0 ? "text-rose-400" : row.netGSTLiability < 0 ? "text-emerald-400" : "text-slate-400"
-            }`}>
-              {formatCurrency(Math.abs(row.netGSTLiability))}
-            </span>
+            <div className="flex items-center gap-3">
+              <span className={`text-lg font-bold font-mono ${
+                row.netGSTLiability > 0 ? "text-rose-400" : row.netGSTLiability < 0 ? "text-emerald-400" : "text-slate-400"
+              }`}>
+                {formatCurrency(Math.abs(row.netGSTLiability))}
+              </span>
+              <AiExplainButton
+                label="Why this amount?"
+                question={`Why is the net GST liability ${formatCurrency(row.netGSTLiability)} for period ${row.monthLabel}?`}
+                contextType="GST_LIABILITY"
+                entityData={{
+                  month: row.monthLabel,
+                  netLiability: row.netGSTLiability,
+                  totalOutputTax: row.totalOutputTax,
+                  totalInputTax: row.totalInputTax,
+                }}
+                variant="inline"
+              />
+            </div>
           </div>
         </div>
       )}

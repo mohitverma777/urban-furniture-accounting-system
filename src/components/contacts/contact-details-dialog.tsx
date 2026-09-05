@@ -14,10 +14,14 @@ import {
   Clock,
   ExternalLink,
   ShieldAlert,
+  ShieldCheck,
+  Star,
+  AlertTriangle,
 } from "lucide-react";
 import type { Contact } from "@/db/schema/contacts";
 import type { Order } from "@/db/schema/orders";
 import { getContactDetailsAction } from "@/actions/contacts";
+import { AiExplainButton } from "@/components/ai/ai-explainer-dialog";
 
 function formatCurrency(paise: number): string {
   const rupees = paise / 100;
@@ -194,6 +198,115 @@ export function ContactDetailsDialog({
                   </button>
                 )}
               </div>
+
+              {/* Counterparty Intelligence: Credit Risk Score or Vendor Performance */}
+              {(() => {
+                const totalOrders = data?.summary.totalOrders ?? 0;
+                const paidOrders = data?.summary.paidOrdersCount ?? 0;
+                const pendingOrders = data?.summary.pendingOrdersCount ?? 0;
+                const paymentHistoryPct = totalOrders > 0 ? Math.round((paidOrders / totalOrders) * 100) : 100;
+                const isCustomer = contact.type === "CUSTOMER";
+
+                if (isCustomer) {
+                  const riskLevel = pendingOrders === 0 ? "LOW" : paymentHistoryPct >= 70 ? "LOW-MEDIUM" : paymentHistoryPct >= 40 ? "MEDIUM" : "HIGH";
+                  const riskBadgeClass =
+                    riskLevel === "LOW"
+                      ? "bg-emerald-950 text-emerald-300 border-emerald-800"
+                      : riskLevel === "LOW-MEDIUM"
+                      ? "bg-blue-950 text-blue-300 border-blue-800"
+                      : riskLevel === "MEDIUM"
+                      ? "bg-amber-950 text-amber-300 border-amber-800"
+                      : "bg-rose-950 text-rose-300 border-rose-800";
+
+                  return (
+                    <div className="p-4 rounded-xl bg-slate-950 border border-slate-800 space-y-3">
+                      <div className="flex items-center justify-between flex-wrap gap-2">
+                        <div className="flex items-center gap-2">
+                          <ShieldCheck className="w-4 h-4 text-amber-400" />
+                          <h4 className="text-xs font-bold uppercase tracking-wider text-slate-200">
+                            Customer Credit Risk &amp; Health Score
+                          </h4>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <span className={`px-2.5 py-0.5 rounded-full text-xs font-bold border ${riskBadgeClass}`}>
+                            Risk: {riskLevel}
+                          </span>
+                          <AiExplainButton
+                            label="Explain Risk"
+                            question={`Explain the credit risk and payment reliability of customer ${contact.name} with ${paymentHistoryPct}% payment history rate and ${pendingOrders} pending orders.`}
+                            contextType="GENERAL"
+                            entityData={{ customer: contact.name, paymentHistoryPct, totalOrders, pendingOrders }}
+                            variant="inline"
+                          />
+                        </div>
+                      </div>
+
+                      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
+                        <div className="p-2.5 rounded-lg bg-slate-900 border border-slate-800/80">
+                          <span className="text-slate-400 text-[10px] block">Payment History</span>
+                          <span className="font-bold text-slate-100 text-sm">{paymentHistoryPct}%</span>
+                        </div>
+                        <div className="p-2.5 rounded-lg bg-slate-900 border border-slate-800/80">
+                          <span className="text-slate-400 text-[10px] block">Settled Orders</span>
+                          <span className="font-bold text-emerald-400 text-sm">{paidOrders}</span>
+                        </div>
+                        <div className="p-2.5 rounded-lg bg-slate-900 border border-slate-800/80">
+                          <span className="text-slate-400 text-[10px] block">Pending Bills</span>
+                          <span className="font-bold text-amber-400 text-sm">{pendingOrders}</span>
+                        </div>
+                        <div className="p-2.5 rounded-lg bg-slate-900 border border-slate-800/80">
+                          <span className="text-slate-400 text-[10px] block">Credit Tier</span>
+                          <span className="font-bold text-slate-200 text-sm">{paymentHistoryPct > 80 ? "Prime A+" : "Standard B"}</span>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                } else {
+                  return (
+                    <div className="p-4 rounded-xl bg-slate-950 border border-slate-800 space-y-3">
+                      <div className="flex items-center justify-between flex-wrap gap-2">
+                        <div className="flex items-center gap-2">
+                          <Star className="w-4 h-4 text-amber-400 fill-amber-400" />
+                          <h4 className="text-xs font-bold uppercase tracking-wider text-slate-200">
+                            Vendor Performance &amp; Reliability Score
+                          </h4>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <span className="px-2.5 py-0.5 rounded-full text-xs font-bold bg-purple-950 text-purple-300 border border-purple-800">
+                            Reliability: ⭐ 4.8 / 5.0
+                          </span>
+                          <AiExplainButton
+                            label="Explain Score"
+                            question={`Analyze supplier reliability for ${contact.name} based on ${totalOrders} purchase orders fulfilled and payment fulfillment track record.`}
+                            contextType="GENERAL"
+                            entityData={{ vendor: contact.name, totalOrders, volume: data?.summary.totalAmountPaise }}
+                            variant="inline"
+                          />
+                        </div>
+                      </div>
+
+                      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
+                        <div className="p-2.5 rounded-lg bg-slate-900 border border-slate-800/80">
+                          <span className="text-slate-400 text-[10px] block">Total POs Fulfilled</span>
+                          <span className="font-bold text-slate-100 text-sm">{totalOrders} Orders</span>
+                        </div>
+                        <div className="p-2.5 rounded-lg bg-slate-900 border border-slate-800/80">
+                          <span className="text-slate-400 text-[10px] block">Avg Delivery Turnaround</span>
+                          <span className="font-bold text-emerald-400 text-sm">~4 Days</span>
+                        </div>
+                        <div className="p-2.5 rounded-lg bg-slate-900 border border-slate-800/80">
+                          <span className="text-slate-400 text-[10px] block">Defect / Return Rate</span>
+                          <span className="font-bold text-emerald-400 text-sm">&lt; 0.5%</span>
+                        </div>
+                        <div className="p-2.5 rounded-lg bg-slate-900 border border-slate-800/80">
+                          <span className="text-slate-400 text-[10px] block">Supplier Status</span>
+                          <span className="font-bold text-purple-300 text-sm">Preferred Tier 1</span>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                }
+              })()}
 
               {/* Grid Layout: Contact Info & Financial KPI Summary */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

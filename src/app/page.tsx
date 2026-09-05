@@ -9,6 +9,7 @@ import { StockSnapshot } from "@/components/dashboard/stock-snapshot";
 import { TalkToLedgerCard } from "@/components/dashboard/talk-to-ledger-card";
 import { AuditLedgerCard } from "@/components/dashboard/audit-ledger-card";
 import { LowStockAlertWidget } from "@/components/dashboard/low-stock-alert-widget";
+import { ExecutiveSummaryButton } from "@/components/dashboard/executive-summary-dialog";
 import {
   TrendingUp,
   TrendingDown,
@@ -38,6 +39,7 @@ export default async function DashboardPage() {
             Real Accounting Data
           </span>
         }
+        actions={<ExecutiveSummaryButton />}
       />
 
       {/* Low Stock & Reorder Alert Banner */}

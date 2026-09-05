@@ -7,6 +7,7 @@ import { Breadcrumbs } from "./breadcrumbs";
 import { MobileNav } from "./mobile-nav";
 import { NavigationMegaMenu } from "./mega-menu";
 import { ThemeToggle } from "@/components/common/theme-toggle";
+import { CommandPalette } from "./command-palette";
 
 interface UserProfile {
   id: string;
@@ -73,6 +74,7 @@ export function Header() {
         </div>
 
         <div className="flex items-center gap-3">
+          <CommandPalette />
           <ThemeToggle />
           {/* User Profile & Role Info */}
           {user ? (

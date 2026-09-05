@@ -15,6 +15,7 @@ import {
   ArrowUpRight,
   Sparkles,
 } from "lucide-react";
+import { AiExplainButton } from "@/components/ai/ai-explainer-dialog";
 
 
 interface ProfitLossClientShellProps {
@@ -312,6 +313,22 @@ export function ProfitLossClientShell({ report }: ProfitLossClientShellProps) {
             <span className="text-slate-300">
               Profit Margin: {report.profitMarginPercentage}%
             </span>
+          </div>
+
+          <div className="pt-2 border-t border-slate-800/80 flex justify-end">
+            <AiExplainButton
+              label="Why did profit change?"
+              question={`Why did net profit stand at ${formatCurrency(report.netProfit)} with a ${report.profitMarginPercentage}% profit margin?`}
+              contextType="PROFIT_CHANGE"
+              entityData={{
+                netProfit: report.netProfit,
+                totalRevenue: report.totalRevenue,
+                totalPurchaseExpenses: report.totalPurchaseExpenses,
+                totalOperatingExpenses: report.totalOperatingExpenses,
+                margin: report.profitMarginPercentage,
+              }}
+              variant="ghost"
+            />
           </div>
         </div>
       </div>

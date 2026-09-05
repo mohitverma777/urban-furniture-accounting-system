@@ -5,6 +5,7 @@ import { TransactionTimeline } from "@/components/accounting/transaction-timelin
 import { PageHeader } from "@/components/common/page-header";
 import { AccountingImpactCard } from "@/components/sales/accounting-impact-card";
 import { SalesInvoiceActions } from "@/components/sales/sales-invoice-actions";
+import { AiExplainButton } from "@/components/ai/ai-explainer-dialog";
 import { ArrowLeft, Building2, Calendar, FileText, CreditCard } from "lucide-react";
 import Link from "next/link";
 
@@ -70,12 +71,26 @@ export default async function SalesInvoiceDetailPage({
           </span>
         }
         actions={
-          <SalesInvoiceActions
-            orderId={order.id}
-            orderNumber={order.orderNumber}
-            status={order.status as "DRAFT" | "BILLED" | "PARTIAL" | "PAID"}
-            outstandingAmount={outstandingAmount}
-          />
+          <div className="flex items-center gap-2 flex-wrap">
+            <AiExplainButton
+              label="Explain This Transaction"
+              question={`Explain the accounting, GST tax, and ledger impact for Invoice ${order.orderNumber} of ₹${(order.totalAmount / 100).toLocaleString("en-IN")}`}
+              contextType="TRANSACTION"
+              entityData={{
+                orderNumber: order.orderNumber,
+                customer: order.contactName,
+                totalAmount: order.totalAmount,
+                status: order.status,
+                taxAmount: order.taxAmount,
+              }}
+            />
+            <SalesInvoiceActions
+              orderId={order.id}
+              orderNumber={order.orderNumber}
+              status={order.status as "DRAFT" | "BILLED" | "PARTIAL" | "PAID"}
+              outstandingAmount={outstandingAmount}
+            />
+          </div>
         }
       />
 
