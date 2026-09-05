@@ -9,6 +9,7 @@ CREATE TABLE `contacts` (
 	`state` text,
 	`pincode` text,
 	`profile_image` text,
+	`is_archived` integer DEFAULT false NOT NULL,
 	`created_at` integer NOT NULL,
 	`updated_at` integer NOT NULL
 );

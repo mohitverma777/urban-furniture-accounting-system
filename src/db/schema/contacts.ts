@@ -35,6 +35,11 @@ export const contacts = sqliteTable(
     /** URL or relative path to profile image */
     profileImage: text("profile_image"),
 
+    /** Soft archive flag */
+    isArchived: integer("is_archived", { mode: "boolean" })
+      .notNull()
+      .default(false),
+
     createdAt: integer("created_at", { mode: "timestamp" })
       .notNull()
       .$defaultFn(() => new Date()),
