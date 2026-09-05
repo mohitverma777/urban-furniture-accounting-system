@@ -36,7 +36,9 @@ describe("Purchase Workflow & Server-side Totals Calculation", () => {
     await db.delete(journalEntries);
     await db.delete(stockMovements);
     await db.delete(orderItems);
-    await db.delete(orders).where(eq(orders.type, "PO"));
+    await db.delete(orders);
+    await db.delete(products);
+    await db.delete(contacts);
 
     // Create fixture vendor
     const [vend] = await db

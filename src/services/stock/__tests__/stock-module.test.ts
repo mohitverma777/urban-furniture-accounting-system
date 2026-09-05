@@ -40,6 +40,8 @@ describe("Stock / Inventory Module & Dynamic Balance Derivation", () => {
     await db.delete(stockMovements);
     await db.delete(orderItems);
     await db.delete(orders);
+    await db.delete(products);
+    await db.delete(contacts);
 
     // Create fixture contacts
     const [cust] = await db

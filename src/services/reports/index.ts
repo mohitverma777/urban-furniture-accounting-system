@@ -7,5 +7,6 @@
 
 export * from "./profit-loss";
 export * from "./balance-sheet";
+export * from "./analytics-tools-service";
 
 

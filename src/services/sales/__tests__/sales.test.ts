@@ -25,7 +25,9 @@ describe("Sales Workflow & Server-side Totals Calculation", () => {
     await db.delete(journalEntries);
     await db.delete(stockMovements);
     await db.delete(orderItems);
-    await db.delete(orders).where(eq(orders.type, "SO"));
+    await db.delete(orders);
+    await db.delete(products);
+    await db.delete(contacts);
 
     // Create fixture customer
     const [cust] = await db

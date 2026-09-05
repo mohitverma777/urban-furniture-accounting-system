@@ -16,6 +16,7 @@ import {
   BarChart3,
   Server,
   Building2,
+  Sparkles,
 } from "lucide-react";
 
 export interface NavItem {
@@ -35,6 +36,7 @@ export const NAV_ITEMS: NavItem[] = [
   { name: "Accounting", href: "/accounting", icon: BookOpen },
   { name: "Budgets", href: "/budgets", icon: PieChart },
   { name: "Reports", href: "/reports", icon: BarChart3 },
+  { name: "AI Assistant", href: "/ai", icon: Sparkles },
   { name: "System", href: "/diagnostics", icon: Server },
 ];
 

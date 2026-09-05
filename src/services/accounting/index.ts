@@ -939,3 +939,4 @@ export function calculateOrderTotals(
 }
 
 export * from "./query";
+export * from "./anomaly-detector";

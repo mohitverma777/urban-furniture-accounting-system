@@ -30,7 +30,7 @@ export interface ProductStockSummaryItem {
 export async function getProductStockSummaries(
   search?: string
 ): Promise<ProductStockSummaryItem[]> {
-  const conditions = [];
+  const conditions = [eq(products.isArchived, false)];
 
   if (search && search.trim() !== "") {
     const searchPattern = `%${search.trim()}%`;
@@ -38,7 +38,7 @@ export async function getProductStockSummaries(
       or(
         like(products.name, searchPattern),
         like(products.category, searchPattern)
-      )
+      )!
     );
   }
 
@@ -51,7 +51,7 @@ export async function getProductStockSummaries(
       isArchived: products.isArchived,
     })
     .from(products)
-    .where(conditions.length > 0 ? and(...conditions) : undefined)
+    .where(and(...conditions))
     .orderBy(products.name);
 
   const result: ProductStockSummaryItem[] = [];

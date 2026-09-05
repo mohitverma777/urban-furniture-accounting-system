@@ -35,6 +35,9 @@ const BaseEnvSchema = z.object({
   STORAGE_PROVIDER: StorageProviderSchema.default("local"),
   AUTH_PROVIDER: AuthProviderSchema.default("demo"),
 
+  // Allow local/demo providers in production build for demo/standalone deployments
+  ALLOW_DEMO_PROD: z.enum(["true", "false"]).default("true"),
+
   // Application
   NEXT_PUBLIC_APP_NAME: z.string().default("Urban Furniture Accounting"),
   NEXT_PUBLIC_APP_VERSION: z.string().default("0.1.0"),
@@ -57,8 +60,9 @@ const BaseEnvSchema = z.object({
 const EnvSchema = BaseEnvSchema.superRefine((data, ctx) => {
   const effectiveEnv = data.APP_ENV ?? data.NODE_ENV;
   const isProd = effectiveEnv === "production";
+  const strictProd = isProd && data.ALLOW_DEMO_PROD === "false";
 
-  if (isProd) {
+  if (strictProd) {
     // Production must declare an explicit database provider
     if (data.DATABASE_PROVIDER === "sqlite") {
       ctx.addIssue({

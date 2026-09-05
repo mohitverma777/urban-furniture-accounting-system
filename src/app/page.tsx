@@ -6,6 +6,7 @@ import { RecentTransactions } from "@/components/dashboard/recent-transactions";
 import { OutstandingInvoices } from "@/components/dashboard/outstanding-invoices";
 import { BudgetUtilization } from "@/components/dashboard/budget-utilization";
 import { StockSnapshot } from "@/components/dashboard/stock-snapshot";
+import { TalkToLedgerCard } from "@/components/dashboard/talk-to-ledger-card";
 import {
   TrendingUp,
   TrendingDown,
@@ -155,6 +156,9 @@ export default async function DashboardPage() {
         />
       ) : (
         <div className="space-y-8">
+          {/* Talk to Your Ledger AI Section */}
+          <TalkToLedgerCard />
+
           {/* Revenue vs Expenses Chart & Budget Utilization Grid */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             {/* Chart Panel */}
