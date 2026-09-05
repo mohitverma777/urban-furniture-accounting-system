@@ -36,6 +36,11 @@ export const products = sqliteTable(
     /** Freeform category label (e.g. "Sofas", "Dining Sets", "Accessories") */
     category: text("category"),
 
+    /** Soft archive flag */
+    isArchived: integer("is_archived", { mode: "boolean" })
+      .notNull()
+      .default(false),
+
     createdAt: integer("created_at", { mode: "timestamp" })
       .notNull()
       .$defaultFn(() => new Date()),

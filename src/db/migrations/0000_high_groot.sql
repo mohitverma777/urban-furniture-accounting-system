@@ -24,6 +24,7 @@ CREATE TABLE `products` (
 	`sales_price` integer DEFAULT 0 NOT NULL,
 	`cost_price` integer DEFAULT 0 NOT NULL,
 	`category` text,
+	`is_archived` integer DEFAULT false NOT NULL,
 	`created_at` integer NOT NULL,
 	`updated_at` integer NOT NULL
 );
