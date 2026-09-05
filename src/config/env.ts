@@ -20,6 +20,7 @@ const DatabaseProviderSchema = z.enum(["sqlite", "turso", "postgres"]);
 const StorageProviderSchema = z.enum(["local", "cloud"]);
 const AuthProviderSchema = z.enum(["demo", "production"]);
 const NodeEnvSchema = z.enum(["development", "test", "production"]);
+const AppEnvSchema = z.enum(["development", "test", "production"]);
 
 // ---------------------------------------------------------------------------
 // Raw schema (always required)
@@ -27,6 +28,7 @@ const NodeEnvSchema = z.enum(["development", "test", "production"]);
 
 const BaseEnvSchema = z.object({
   NODE_ENV: NodeEnvSchema.default("development"),
+  APP_ENV: AppEnvSchema.optional(),
 
   // Provider switches — default to local/demo for development
   DATABASE_PROVIDER: DatabaseProviderSchema.default("sqlite"),
@@ -53,7 +55,8 @@ const BaseEnvSchema = z.object({
 // ---------------------------------------------------------------------------
 
 const EnvSchema = BaseEnvSchema.superRefine((data, ctx) => {
-  const isProd = data.NODE_ENV === "production";
+  const effectiveEnv = data.APP_ENV ?? data.NODE_ENV;
+  const isProd = effectiveEnv === "production";
 
   if (isProd) {
     // Production must declare an explicit database provider
@@ -132,13 +135,11 @@ if (!_parsed.success) {
 
 export const env = _parsed.data;
 
-// ---------------------------------------------------------------------------
-// Convenience booleans
-// ---------------------------------------------------------------------------
+export const appEnv = env.APP_ENV ?? env.NODE_ENV;
 
-export const isProduction = env.NODE_ENV === "production";
-export const isDevelopment = env.NODE_ENV === "development";
-export const isTest = env.NODE_ENV === "test";
+export const isProduction = appEnv === "production";
+export const isDevelopment = appEnv === "development";
+export const isTest = appEnv === "test";
 
 export const isDemoAuth = env.AUTH_PROVIDER === "demo";
 export const isSqliteDb = env.DATABASE_PROVIDER === "sqlite";
