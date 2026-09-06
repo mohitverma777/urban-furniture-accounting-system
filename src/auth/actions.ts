@@ -41,10 +41,7 @@ export async function adminCreateUserAction(input: AdminCreateUserInput) {
 }
 
 export async function listUsersAction() {
-  const user = await getCurrentUser();
-  if (!user || (user.role !== "ADMIN" && user.role !== "ACCOUNTANT")) {
-    throw new Error("Forbidden: Requires ADMIN or ACCOUNTANT role");
-  }
+  await requireRole("ADMIN");
   const users = listUsers();
   return { success: true, users };
 }
