@@ -58,6 +58,8 @@ export function Header() {
     }
   };
 
+  const isStaff = user?.role === "ADMIN" || user?.role === "ACCOUNTANT";
+
   return (
     <>
       <header className="h-16 bg-slate-950/80 border-b border-slate-800 px-4 sm:px-6 flex items-center justify-between sticky top-0 z-30 backdrop-blur-md select-none print:hidden">
@@ -70,11 +72,11 @@ export function Header() {
             <Menu className="w-5 h-5" />
           </button>
           <Breadcrumbs />
-          <NavigationMegaMenu />
+          {isStaff && <NavigationMegaMenu />}
         </div>
 
         <div className="flex items-center gap-3">
-          <CommandPalette />
+          {isStaff && <CommandPalette />}
           <ThemeToggle />
           {/* User Profile & Role Info */}
           {user ? (
