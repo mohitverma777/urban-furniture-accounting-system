@@ -10,10 +10,10 @@ export function getAiModel(modelOverride?: string) {
   const provider = process.env.AI_PROVIDER || "ollama";
 
   if (provider === "google" || provider === "gemini") {
-    const apiKey = process.env.GEMINI_API_KEY;
+    const apiKey = process.env.GEMINI_API_KEY || process.env.gemini_api_key;
     if (!apiKey) {
       throw new Error(
-        "[AI] GEMINI_API_KEY is not set. Add it to .env.local as GEMINI_API_KEY=<your-key>"
+        "[AI] GEMINI_API_KEY is not set. Add it to .env or .env.local as GEMINI_API_KEY=<your-key>"
       );
     }
     const google = createGoogleGenerativeAI({ apiKey });

@@ -163,7 +163,41 @@ cd urban-furniture-accounting-system
 npm install --legacy-peer-deps
 ```
 
-### 3. Initialize & Seed Database
+### 3. Environment & AI Engine Setup
+Copy the example environment configuration:
+```bash
+cp .env.example .env
+```
+
+The system features a **hybrid AI architecture** supporting two modes:
+
+#### Option A: Local Ollama (Recommended for 100% Offline / Free / Air-Gapped)
+No API keys or cloud dependencies needed!
+1. Install Ollama from **[ollama.com](https://ollama.com)**.
+2. Pull and start the recommended model:
+   ```bash
+   ollama run gemma3:4b
+   # or alternately: ollama run qwen2.5:7b
+   ```
+3. Set in your `.env`:
+   ```env
+   AI_PROVIDER=ollama
+   OLLAMA_BASE_URL=http://localhost:11434/v1
+   OLLAMA_MODEL=gemma3:4b
+   ```
+   *(Defaults to `http://localhost:11434/v1` and `gemma3:4b` automatically).*
+
+#### Option B: Google Gemini Cloud (High-Speed Inference)
+1. Obtain a free API key from **[Google AI Studio](https://aistudio.google.com)**.
+2. Set in your `.env`:
+   ```env
+   AI_PROVIDER=google
+   GEMINI_API_KEY=your_gemini_api_key_here
+   ```
+
+---
+
+### 4. Initialize & Seed Database
 The project utilizes SQLite with Drizzle ORM. Run the automated seed script to populate isolated test data, contacts, products, chart of accounts, double-entry vouchers, and budgets:
 
 ```bash
@@ -172,7 +206,7 @@ npm run db:push
 npx tsx src/db/seed.ts
 ```
 
-### 4. Run Development Server
+### 5. Run Development Server
 ```bash
 npm run dev
 ```

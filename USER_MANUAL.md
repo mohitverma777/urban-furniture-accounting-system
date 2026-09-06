@@ -119,14 +119,33 @@ npm run db:push
 npx tsx src/db/seed.ts
 ```
 
-### 4. Configure AI Engine (Optional)
-The system operates seamlessly offline using built-in analytical logic or local Ollama. To enable Google Gemini 2.5 Flash:
-Create or edit `.env`:
-```env
-AI_PROVIDER=google
-GEMINI_API_KEY=your_google_gemini_api_key_here
-```
-*(If no API key is provided, the system automatically uses local Ollama or fallback analytical reasoning without throwing runtime errors).*
+### 4. Configure AI Engine (Local Ollama or Google Gemini)
+The system features a **hybrid AI architecture** supporting two operational modes:
+
+#### Option A: Local Ollama (100% Offline / Free / Air-Gapped)
+No cloud dependency or external API keys needed:
+1. Download and install Ollama from **[ollama.com](https://ollama.com)**.
+2. Open a terminal and run:
+   ```bash
+   ollama run gemma3:4b
+   ```
+   *(Alternatively, `ollama run qwen2.5:7b` or `ollama run llama3.2` are also supported).*
+3. Create or verify `.env`:
+   ```env
+   AI_PROVIDER=ollama
+   OLLAMA_BASE_URL=http://localhost:11434/v1
+   OLLAMA_MODEL=gemma3:4b
+   ```
+   The application automatically connects to your local Ollama instance on port `11434`.
+
+#### Option B: Google Gemini Cloud
+1. Generate an API key at **[Google AI Studio](https://aistudio.google.com)**.
+2. In `.env`:
+   ```env
+   AI_PROVIDER=google
+   GEMINI_API_KEY=your_gemini_api_key_here
+   ```
+*(If no configuration is set, the system defaults to Ollama or analytical heuristics without runtime crashes).*
 
 ### 5. Launch the Application
 ```bash
