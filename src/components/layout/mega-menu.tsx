@@ -90,7 +90,7 @@ export function NavigationMegaMenu() {
     { title: "Profit and Loss", href: "/reports/profit-loss", icon: TrendingUp },
     { title: "GST Tax Summary", href: "/reports/gst", icon: Receipt },
     { title: "Budget Report", href: "/budgets", icon: BarChart3 },
-    { title: "Audit Trail", href: "/audit-log", icon: History },
+    { title: "Audit Trail", href: "/admin/users?tab=audit", icon: History },
   ];
 
   return (

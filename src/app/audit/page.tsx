@@ -1,5 +1,5 @@
 import { redirect } from "next/navigation";
 
 export default function AuditRedirectPage() {
-  redirect("/audit-log");
+  redirect("/admin/users?tab=audit");
 }
