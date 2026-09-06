@@ -38,10 +38,16 @@ export async function GET(req: NextRequest) {
     const { searchParams } = new URL(req.url);
     const q = (searchParams.get("q") || "").trim().toLowerCase();
 
+    const role = req.cookies.get("uf_user_role")?.value;
+    const allowedStaticNav = STATIC_NAVIGATION.filter((item) => {
+      if (item.url.startsWith("/admin") && role !== "ADMIN") return false;
+      return true;
+    });
+
     if (!q) {
       return NextResponse.json({
         success: true,
-        results: STATIC_NAVIGATION.slice(0, 8),
+        results: allowedStaticNav.slice(0, 8),
       });
     }
 
@@ -49,7 +55,7 @@ export async function GET(req: NextRequest) {
     const results: SearchResultItem[] = [];
 
     // 1. Match Navigation
-    const matchedNav = STATIC_NAVIGATION.filter(
+    const matchedNav = allowedStaticNav.filter(
       (n) => n.title.toLowerCase().includes(q) || n.subtitle.toLowerCase().includes(q)
     );
     results.push(...matchedNav.slice(0, 3));

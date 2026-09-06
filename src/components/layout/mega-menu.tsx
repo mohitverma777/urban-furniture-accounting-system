@@ -27,9 +27,25 @@ import {
   X,
 } from "lucide-react";
 
-export function NavigationMegaMenu() {
+export function NavigationMegaMenu({ userRole }: { userRole?: string } = {}) {
   const [isOpen, setIsOpen] = useState(false);
+  const [role, setRole] = useState<string | null>(userRole || null);
   const menuRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (userRole) {
+      setRole(userRole);
+      return;
+    }
+    fetch("/api/auth/me")
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.authenticated && data.user) {
+          setRole(data.user.role);
+        }
+      })
+      .catch(() => {});
+  }, [userRole]);
 
   // Close when clicking outside
   useEffect(() => {
@@ -90,7 +106,9 @@ export function NavigationMegaMenu() {
     { title: "Profit and Loss", href: "/reports/profit-loss", icon: TrendingUp },
     { title: "GST Tax Summary", href: "/reports/gst", icon: Receipt },
     { title: "Budget Report", href: "/budgets", icon: BarChart3 },
-    { title: "Audit Trail", href: "/admin/users?tab=audit", icon: History },
+    ...(role === "ADMIN"
+      ? [{ title: "Audit Trail", href: "/admin/users?tab=audit", icon: History }]
+      : []),
   ];
 
   return (

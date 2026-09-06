@@ -72,7 +72,7 @@ export function Header() {
             <Menu className="w-5 h-5" />
           </button>
           <Breadcrumbs />
-          {isStaff && <NavigationMegaMenu />}
+          {isStaff && <NavigationMegaMenu userRole={user?.role} />}
         </div>
 
         <div className="flex items-center gap-3">
