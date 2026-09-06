@@ -72,23 +72,46 @@ function AdminUsersContent() {
   const [resetError, setResetError] = useState("");
   const [resetSuccess, setResetSuccess] = useState("");
 
+  const [currentUserRole, setCurrentUserRole] = useState<string>("ADMIN");
+
+  useEffect(() => {
+    fetch("/api/auth/me")
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.authenticated && data.user) {
+          setCurrentUserRole(data.user.role);
+        }
+      })
+      .catch(() => {});
+  }, []);
+
   const loadUsers = async () => {
     setLoading(true);
-    const res = await listUsersAction();
-    if (res.success && res.users) {
-      setUsers(res.users as unknown as UserItem[]);
+    try {
+      const res = await listUsersAction();
+      if (res.success && res.users) {
+        setUsers(res.users as unknown as UserItem[]);
+      }
+    } catch (err) {
+      console.warn("[User Management] Could not load users:", err);
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   };
 
   const loadAuditLogs = async () => {
     setLoadingAudit(true);
-    const res = await getAuditLogsAction();
-    if (res.success && res.logs) {
-      setAuditLogs(res.logs as ChangeLog[]);
-      setAuditStats(res.stats);
+    try {
+      const res = await getAuditLogsAction();
+      if (res.success && res.logs) {
+        setAuditLogs(res.logs as ChangeLog[]);
+        setAuditStats(res.stats);
+      }
+    } catch (err) {
+      console.warn("[User Management] Could not load audit logs:", err);
+    } finally {
+      setLoadingAudit(false);
     }
-    setLoadingAudit(false);
   };
 
   useEffect(() => {
@@ -99,16 +122,16 @@ function AdminUsersContent() {
   // Sync tab with URL if user toggles
   const handleTabChange = (tab: "users" | "audit") => {
     setActiveTab(tab);
+    if (tab === "audit") {
+      loadAuditLogs();
+    }
     const currentUrl = new URL(window.location.href);
     if (tab === "audit") {
       currentUrl.searchParams.set("tab", "audit");
-      if (auditLogs.length === 0) {
-        loadAuditLogs();
-      }
     } else {
       currentUrl.searchParams.delete("tab");
     }
-    router.replace(currentUrl.pathname + currentUrl.search);
+    window.history.replaceState(null, "", currentUrl.pathname + currentUrl.search);
   };
 
   const handleCreateSubmit = async (e: React.FormEvent) => {

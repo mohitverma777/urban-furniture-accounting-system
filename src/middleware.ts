@@ -104,8 +104,8 @@ export function middleware(request: NextRequest) {
     return NextResponse.redirect(new URL(getDashboardForRole(role), request.url));
   }
 
-  // Non-ADMIN trying to access /admin routes
-  if (pathname.startsWith("/admin") && role !== "ADMIN") {
+  // Allow ADMIN and ACCOUNTANT to access /admin/users (which houses User Management & Audit Trail)
+  if (pathname.startsWith("/admin") && role !== "ADMIN" && role !== "ACCOUNTANT") {
     return NextResponse.redirect(new URL(getDashboardForRole(role), request.url));
   }
 

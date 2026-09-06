@@ -99,12 +99,11 @@ export function ChatMessage({ message }: ChatMessageProps) {
             return (
               <div key={idx} className="w-full">
                 {cleanText && (
-                  <div
-                    className={`px-4 py-3 rounded-2xl text-sm leading-relaxed whitespace-pre-wrap ${isUser
-                        ? "bg-amber-500/15 border border-amber-500/30 text-black-950 dark:text-amber-100 font-medium"
+                    className={`px-4 py-3 rounded-2xl text-sm leading-relaxed whitespace-pre-wrap ${
+                      isUser
+                        ? "bg-amber-500/15 border border-amber-500/30 text-black font-semibold dark:text-amber-100"
                         : "bg-slate-800/80 border border-slate-700/50 text-slate-200"
-                      }`}
-                  >
+                    }`}
                     <FormattedText text={cleanText} isUser={isUser} />
                   </div>
                 )}
@@ -127,12 +126,11 @@ export function ChatMessage({ message }: ChatMessageProps) {
               return (
                 <>
                   {cleanText && (
-                    <div
-                      className={`px-4 py-3 rounded-2xl text-sm leading-relaxed whitespace-pre-wrap ${isUser
-                          ? "bg-amber-500/15 border border-amber-500/30 text-amber-950 dark:text-amber-100 font-medium"
+                      className={`px-4 py-3 rounded-2xl text-sm leading-relaxed whitespace-pre-wrap ${
+                        isUser
+                          ? "bg-amber-500/15 border border-amber-500/30 text-black font-semibold dark:text-amber-100"
                           : "bg-slate-800/80 border border-slate-700/50 text-slate-200"
-                        }`}
-                    >
+                      }`}
                       <FormattedText text={cleanText} isUser={isUser} />
                     </div>
                   )}

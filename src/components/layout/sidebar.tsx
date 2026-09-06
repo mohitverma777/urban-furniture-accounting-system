@@ -42,7 +42,7 @@ export const NAV_ITEMS: NavItem[] = [
   { name: "Budgets", href: "/budgets", icon: PieChart, roles: ["ADMIN", "ACCOUNTANT"] },
   { name: "Reports", href: "/reports", icon: BarChart3, roles: ["ADMIN", "ACCOUNTANT"] },
   { name: "Data Import", href: "/import", icon: UploadCloud, roles: ["ADMIN", "ACCOUNTANT"] },
-  { name: "User Management", href: "/admin/users", icon: Users, roles: ["ADMIN"] },
+  { name: "User Management & Audit", href: "/admin/users", icon: Users, roles: ["ADMIN", "ACCOUNTANT"] },
   { name: "AI Assistant", href: "/ai", icon: Sparkles, roles: ["ADMIN", "ACCOUNTANT", "USER"] },
 ];
 
