@@ -43,7 +43,7 @@ export const NAV_ITEMS: NavItem[] = [
   { name: "Reports", href: "/reports", icon: BarChart3, roles: ["ADMIN", "ACCOUNTANT"] },
   { name: "Data Import", href: "/import", icon: UploadCloud, roles: ["ADMIN", "ACCOUNTANT"] },
   { name: "User Management & Audit", href: "/admin/users", icon: Users, roles: ["ADMIN"] },
-  { name: "AI Assistant", href: "/ai", icon: Sparkles, roles: ["ADMIN", "ACCOUNTANT", "USER"] },
+  { name: "AI Assistant", href: "/ai", icon: Sparkles, roles: ["ADMIN", "ACCOUNTANT"] },
 ];
 
 export function Sidebar() {

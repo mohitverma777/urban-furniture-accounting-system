@@ -66,7 +66,7 @@ Use this directory to quickly navigate to any module:
 | `/reports/cash-flow` | **Predictive Cash Flow** | Linear regression forecast with 95% confidence intervals | Admin, Accountant |
 | `/budgets` | **Budgets & Cost Centers** | Departmental analytic accounts with spend limit alerts | Admin, Accountant |
 | `/import` | **Master Data Import** | Bulk CSV/XLSX import for Customers & Products with preview & duplicate prevention | Admin, Accountant |
-| `/ai` | **AI Assistant** | "Talk to Your Ledger" multi-turn conversational financial agent | All Roles |
+| `/ai` | **AI Assistant** | "Talk to Your Ledger" multi-turn conversational financial agent | Admin, Accountant |
 | `/admin/users` | **User Management** | Create system credentials, toggle active status, reset passwords | Admin Only |
 | `/portal` | **Customer Portal** | Self-service invoice downloads, receipts, statement reconciliation | Customer (User) |
 
