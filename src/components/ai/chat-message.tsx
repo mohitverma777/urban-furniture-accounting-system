@@ -34,11 +34,10 @@ export function ChatMessage({ message }: ChatMessageProps) {
     <div className={`flex gap-3 ${isUser ? "flex-row-reverse" : "flex-row"}`}>
       {/* Avatar */}
       <div
-        className={`w-8 h-8 rounded-xl flex items-center justify-center shrink-0 mt-1 ${
-          isUser
+        className={`w-8 h-8 rounded-xl flex items-center justify-center shrink-0 mt-1 ${isUser
             ? "bg-amber-500/20 border border-amber-500/30"
             : "bg-violet-500/20 border border-violet-500/30"
-        }`}
+          }`}
       >
         {isUser ? (
           <User className="w-4 h-4 text-amber-700 dark:text-amber-400" />
@@ -101,11 +100,10 @@ export function ChatMessage({ message }: ChatMessageProps) {
               <div key={idx} className="w-full">
                 {cleanText && (
                   <div
-                    className={`px-4 py-3 rounded-2xl text-sm leading-relaxed whitespace-pre-wrap ${
-                      isUser
-                        ? "bg-amber-500/15 border border-amber-500/30 text-amber-950 dark:text-amber-100 font-medium"
+                    className={`px-4 py-3 rounded-2xl text-sm leading-relaxed whitespace-pre-wrap ${isUser
+                        ? "bg-amber-500/15 border border-amber-500/30 text-black-950 dark:text-amber-100 font-medium"
                         : "bg-slate-800/80 border border-slate-700/50 text-slate-200"
-                    }`}
+                      }`}
                   >
                     <FormattedText text={cleanText} isUser={isUser} />
                   </div>
@@ -130,11 +128,10 @@ export function ChatMessage({ message }: ChatMessageProps) {
                 <>
                   {cleanText && (
                     <div
-                      className={`px-4 py-3 rounded-2xl text-sm leading-relaxed whitespace-pre-wrap ${
-                        isUser
+                      className={`px-4 py-3 rounded-2xl text-sm leading-relaxed whitespace-pre-wrap ${isUser
                           ? "bg-amber-500/15 border border-amber-500/30 text-amber-950 dark:text-amber-100 font-medium"
                           : "bg-slate-800/80 border border-slate-700/50 text-slate-200"
-                      }`}
+                        }`}
                     >
                       <FormattedText text={cleanText} isUser={isUser} />
                     </div>
@@ -163,9 +160,8 @@ function FormattedText({ text, isUser }: { text: string; isUser?: boolean }) {
               j % 2 === 1 ? (
                 <strong
                   key={j}
-                  className={`font-semibold ${
-                    isUser ? "text-amber-950 dark:text-amber-50" : "text-white"
-                  }`}
+                  className={`font-semibold ${isUser ? "text-amber-950 dark:text-amber-50" : "text-white"
+                    }`}
                 >
                   {part}
                 </strong>
