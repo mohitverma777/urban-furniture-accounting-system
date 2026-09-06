@@ -41,7 +41,7 @@ export function ChatMessage({ message }: ChatMessageProps) {
         }`}
       >
         {isUser ? (
-          <User className="w-4 h-4 text-amber-400" />
+          <User className="w-4 h-4 text-amber-700 dark:text-amber-400" />
         ) : (
           <Bot className="w-4 h-4 text-violet-400" />
         )}
@@ -103,11 +103,11 @@ export function ChatMessage({ message }: ChatMessageProps) {
                   <div
                     className={`px-4 py-3 rounded-2xl text-sm leading-relaxed whitespace-pre-wrap ${
                       isUser
-                        ? "bg-amber-500/15 border border-amber-500/20 text-amber-50"
+                        ? "bg-amber-500/15 border border-amber-500/30 text-amber-950 dark:text-amber-100 font-medium"
                         : "bg-slate-800/80 border border-slate-700/50 text-slate-200"
                     }`}
                   >
-                    <FormattedText text={cleanText} />
+                    <FormattedText text={cleanText} isUser={isUser} />
                   </div>
                 )}
                 {chartPayload && <StructuredChartRenderer chart={chartPayload} />}
@@ -132,11 +132,11 @@ export function ChatMessage({ message }: ChatMessageProps) {
                     <div
                       className={`px-4 py-3 rounded-2xl text-sm leading-relaxed whitespace-pre-wrap ${
                         isUser
-                          ? "bg-amber-500/15 border border-amber-500/20 text-amber-50"
+                          ? "bg-amber-500/15 border border-amber-500/30 text-amber-950 dark:text-amber-100 font-medium"
                           : "bg-slate-800/80 border border-slate-700/50 text-slate-200"
                       }`}
                     >
-                      <FormattedText text={cleanText} />
+                      <FormattedText text={cleanText} isUser={isUser} />
                     </div>
                   )}
                   {chartPayload && <StructuredChartRenderer chart={chartPayload} />}
@@ -151,7 +151,7 @@ export function ChatMessage({ message }: ChatMessageProps) {
 }
 
 /** Very lightweight markdown-ish formatter — bolds **text**, renders line breaks. */
-function FormattedText({ text }: { text: string }) {
+function FormattedText({ text, isUser }: { text: string; isUser?: boolean }) {
   const lines = text.split("\n");
   return (
     <>
@@ -161,7 +161,12 @@ function FormattedText({ text }: { text: string }) {
           <span key={i}>
             {parts.map((part, j) =>
               j % 2 === 1 ? (
-                <strong key={j} className="font-semibold text-white">
+                <strong
+                  key={j}
+                  className={`font-semibold ${
+                    isUser ? "text-amber-950 dark:text-amber-50" : "text-white"
+                  }`}
+                >
                   {part}
                 </strong>
               ) : (
